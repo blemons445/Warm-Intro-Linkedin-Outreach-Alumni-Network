@@ -1,6 +1,6 @@
 # Warm Intro
 
-**Turn applications into conversations.** You tell Warm Intro where you've applied. It finds alumni and recruiters at each company, links their LinkedIn profiles, drafts a short first message, and helps you turn replies into coffee chats and referrals. It isn't a job board: Simplify and others already find jobs. Warm Intro starts after you apply.
+**Turn applications into conversations.** You tell Warm Intro where you've applied. It finds people at each company you share something with (school, hometown, clubs, past jobs), plus the team and recruiters, links their LinkedIn profiles, drafts a short first message, and helps you turn replies into coffee chats and referrals. It isn't a job board: Simplify and others already find jobs. Warm Intro starts after you apply.
 
 **Live app:** https://warm-intro-linkedin-outreach-alumni.vercel.app/
 
@@ -16,7 +16,7 @@ Referrals are only 6 to 7% of job applications but 30 to 50% of hires ([Chanty](
 |------|--------------|
 | 1. Set your target | Claude asks about ten short questions: cities, role, term, companies, school and year. |
 | 2. Find open internships | Every posting is checked on the company's own careers site, with the best match flagged. |
-| 3. Find alumni and recruiters | People you already know first, then alumni from your school, each confirmed from their education history. Recent graduates first. |
+| 3. Find people to message | People you share something with first (school, hometown, clubs, past jobs), then former interns, the team and recruiters, each confirmed from a source. |
 | 4. Draft first messages | A connection note under LinkedIn's 200-character limit, with one easy question. No referral asks. |
 | 5. Tailor your resume | Rewritten to match the posting using only what's true, as a one-page PDF. |
 | Tracker | Every message and application with its status, plus totals for a LinkedIn post. |
@@ -26,7 +26,7 @@ You send every message and every application yourself. The tool never sends, app
 
 ## How to use it
 
-**Fastest:** open the [live app](https://warm-intro-linkedin-outreach-alumni.vercel.app/#try), add your school and the jobs you applied to (or fill them from your tracker), and press **Find my people**. For each application you get the posting link plus alumni and recruiters with LinkedIn links and a drafted note. When someone replies, "prep me" builds a coffee chat sheet that ends with a referral ask. **Watch a sample run** shows the whole flow without a search.
+**Fastest:** open the [live app](https://warm-intro-linkedin-outreach-alumni.vercel.app/#try), add your school and the jobs you applied to (or fill them from your tracker), and press **Find my people**. For each application you get the posting link plus people with LinkedIn links and a drafted note. When someone replies, "prep me" builds a coffee chat sheet that ends with a referral ask. **Watch a sample run** shows the whole flow without a search.
 
 **Deeper search in Claude:** on **Use in Claude**, do the one-time setup (a free Claude account, optionally a free [Clay](https://app.clay.com/signup) account), copy the skill into a new chat and say "Help me find an internship."
 

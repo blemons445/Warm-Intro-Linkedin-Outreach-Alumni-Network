@@ -7,6 +7,7 @@ How Warm Intro got to where it is. Each change came from using it on a real inte
 - Results are grouped by application, with the posting link and a LinkedIn profile link for every person. People without a confirmed profile link are dropped.
 - New flow: reach out, track replies, coffee chat, then a referral ask for that exact role, written into the chat prep sheet.
 - Applications can be filled straight from the tracker.
+- Not just alumni: it looks for any shared ground (school, hometown, clubs, past employers), plus former interns, the team and recruiters. School is optional.
 
 ## 1.2.0 (Oct 10, 2026): The full flow on one page
 - Results now walk through four steps: apply, message, track and prep for the chat.

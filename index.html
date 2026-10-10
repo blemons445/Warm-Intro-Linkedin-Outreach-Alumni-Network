@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Warm Intro: AI internship outreach for students</title>
-  <meta name="description" content="A free tool for students who have already applied: it finds alumni and recruiters at each company, writes short LinkedIn messages and turns replies into coffee chats and referrals.">
+  <meta name="description" content="A free tool for students who have already applied: it finds people worth messaging at each company, writes short LinkedIn messages and turns replies into coffee chats and referrals.">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,7 +42,7 @@
         <div class="hero">
           <p class="badge">Free for students · Powered by Claude</p>
           <h1 id="home-title">You applied. Now meet the <span class="hl">people</span> behind the posting.</h1>
-          <p class="lede">Tell Warm Intro where you applied. It finds alumni and recruiters at each company, links their LinkedIn profiles and writes a short first message. Then it helps you turn replies into coffee chats and referrals.</p>
+          <p class="lede">Tell Warm Intro where you applied. It finds people at each company you share something with, plus the team and recruiters, links their LinkedIn profiles and writes a short first message. Then it helps you turn replies into coffee chats and referrals.</p>
           <div class="actions">
             <a class="btn primary lg" href="#try">Try it free</a>
             <a class="btn lg" href="#try" data-demo>Watch a sample run</a>
@@ -84,7 +84,7 @@
           <div class="pv-card">
             <div class="list-row"><div><div class="pv-name">Summer Sales Intern</div><div class="pv-sub">Acme Foods · Dallas</div></div><span class="pill"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> Applied</span></div>
             <div class="list-row"><div><div class="pv-name">Brand Marketing Intern</div><div class="pv-sub">Lone Star Beverage · Plano</div></div><span class="pill"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> Applied</span></div>
-            <div class="list-row"><div><div class="pv-name">Field Sales Intern</div><div class="pv-sub">Northfield Snacks · Irving</div></div><span class="chip">3 alumni found</span></div>
+            <div class="list-row"><div><div class="pv-name">Field Sales Intern</div><div class="pv-sub">Northfield Snacks · Irving</div></div><span class="chip">3 people found</span></div>
           </div>
         </div>
       </div>
@@ -92,13 +92,13 @@
       <div class="feature flip">
         <div class="f-text">
           <p class="kicker">Step 2</p>
-          <h2>Alumni first, each one confirmed and linked</h2>
-          <p>For each application it finds alumni from your school on the right team, former interns and the program's recruiter, each with a LinkedIn profile link. Every school claim is checked, because similar names don't count.</p>
+          <h2>Shared ground first, each one confirmed and linked</h2>
+          <p>For each application it looks for people you share something with: your school, hometown, a club or a past employer. Then former interns, the team and the recruiter. Each one has a LinkedIn profile link, and every shared-ground claim is checked against a source.</p>
         </div>
         <div class="f-visual" aria-hidden="true">
           <div class="pv-card">
             <div class="pv-row"><span class="avatar">PS</span><div><div class="pv-name">Priya Shah</div><div class="pv-sub">Campus Recruiter · Acme Foods</div></div><span class="chip">Alum '22</span></div>
-            <div class="pv-row"><span class="avatar">MH</span><div><div class="pv-name">Marcus Hill</div><div class="pv-sub">Brand Manager · Lone Star</div></div><span class="chip">Alum '21</span></div>
+            <div class="pv-row"><span class="avatar">MH</span><div><div class="pv-name">Marcus Hill</div><div class="pv-sub">Brand Manager · Lone Star</div></div><span class="chip">Same hometown</span></div>
             <div class="pv-row"><span class="avatar">BC</span><div><div class="pv-name">Ben Carter</div><div class="pv-sub">Field Sales · Northfield</div></div><span class="chip">Former intern</span></div>
           </div>
         </div>
@@ -131,9 +131,9 @@
         <details><summary>Is it free?</summary><p>Yes. Try it on this site with no account, or run the skill in your own Claude account, which has a free plan.</p></details>
         <details><summary>Is this a job board?</summary><p>No. Simplify, Intern Insider and others already find jobs. Warm Intro starts after you apply and helps you reach the people at those companies.</p></details>
         <details><summary>Does it send messages for me?</summary><p>No. It drafts them and you review and send each one yourself on LinkedIn.</p></details>
-        <details><summary>Do I need an account?</summary><p>No. Add your school and where you applied on Try it, and the site does the searching. Running the skill in Claude with Clay connected finds more alumni if you want to go deeper.</p></details>
+        <details><summary>Do I need an account?</summary><p>No. Add your school and where you applied on Try it, and the site does the searching. Running the skill in Claude with Clay connected finds more people if you want to go deeper.</p></details>
         <details><summary>Where is my data stored?</summary><p>Your tracker lives only in your own browser. When you use Try it, your answers are sent to Claude to run the search and aren't saved by this site. Use Back up on the Tracker page to keep a copy.</p></details>
-        <details><summary>Does it work for any school?</summary><p>Yes. It was built at Texas A&amp;M, but you tell it your school and it searches for your alumni.</p></details>
+        <details><summary>Does it only find alumni?</summary><p>No. Alumni are a great start, but it also looks for people from your hometown, clubs or past jobs, former interns, the team you applied to and the recruiter. It works for any school.</p></details>
       </section>
 
       <section class="recruit" aria-labelledby="recruit-h">
@@ -159,10 +159,10 @@
     <!-- TRY -->
     <section class="view" data-view="try" aria-labelledby="try-title" hidden>
       <h1 id="try-title">Try it</h1>
-      <p class="lede">Already applied? Tell us where. Warm Intro finds alumni and recruiters at each company, links their LinkedIn profiles and writes your first message, so your application has a person behind it.</p>
+      <p class="lede">Already applied? Tell us where. Warm Intro finds people at each company you share something with, plus the team and recruiters, links their LinkedIn profiles and writes your first message, so your application has a person behind it.</p>
 
       <form class="card try-form" id="try-form" novalidate>
-        <label class="school">Your school<input id="t-school" name="school" required maxlength="80" placeholder="Texas A&amp;M University" autocomplete="organization"></label>
+        <label class="school">Your school<input id="t-school" name="school" maxlength="80" placeholder="Texas A&amp;M University" autocomplete="organization"></label>
         <fieldset class="apps">
           <legend>Jobs you applied to</legend>
           <div id="t-apps"></div>
@@ -172,11 +172,14 @@
           </div>
         </fieldset>
         <details class="more">
-          <summary>Add more about you (optional)</summary>
+          <summary>Add more about you to find more shared ground (optional)</summary>
           <div class="try-grid">
             <label>Your first name<input id="t-name" name="name" maxlength="60" placeholder="Bruce"></label>
             <label>Major<input id="t-major" name="major" maxlength="60" placeholder="Marketing"></label>
             <label>Year<input id="t-year" name="year" maxlength="20" placeholder="Junior"></label>
+            <label>Hometown<input id="t-hometown" name="hometown" maxlength="80" placeholder="Katy, TX"></label>
+            <label class="wide">Clubs, teams or organizations<input id="t-orgs" name="orgs" maxlength="160" placeholder="AMA, Corps of Cadets, club soccer"></label>
+            <label class="wide">Past jobs or internships<input id="t-past" name="past" maxlength="160" placeholder="Target, H-E-B"></label>
           </div>
         </details>
         <label class="code-row" id="t-code-row" hidden>Access code<input id="t-code" name="code" maxlength="60" autocomplete="off" placeholder="From Bruce"></label>
@@ -207,7 +210,7 @@
           </div>
         </div>
         <h2>1. Reach out to the people behind each application</h2>
-        <p class="src">Copy the note, open their LinkedIn profile, click Connect, then Add a note. Alumni first: they're the most likely to reply.</p>
+        <p class="src">Copy the note, open their LinkedIn profile, click Connect, then Add a note. Start with people you share something with: they're the most likely to reply.</p>
         <div id="t-groups"></div>
         <h2>2. Track every reply</h2>
         <div class="track-step">
@@ -422,6 +425,6 @@
   </footer>
 
   <div class="toast" id="toast" role="status" hidden></div>
-  <script src="assets/app.js?v=4.0"></script>
+  <script src="assets/app.js?v=4.1"></script>
 </body>
 </html>

@@ -70,7 +70,7 @@
   const RUN_STEPS = [
     { key: "target", title: "Set your target", say: "Help me find an internship.", note: "Claude asks about ten short questions: where, what role, which companies, your school and year." },
     { key: "roles", title: "Find open internships", say: "Find open internships for my targets.", note: "You get a list of postings checked on each company's own site, with the best match flagged. Apply to that one soon." },
-    { key: "people", title: "Find alumni and recruiters", say: "Find people at those companies.", note: "Alumni and recruiters at companies with an open posting, recent graduates first, each with a reason to reach out." },
+    { key: "people", title: "Find people to message", say: "Find people at those companies.", note: "Alumni and recruiters at companies with an open posting, recent graduates first, each with a reason to reach out." },
     { key: "drafts", title: "Draft your messages", say: "Draft messages for this batch.", note: "Review each one, send it yourself on LinkedIn, then add it to the Tracker." },
     { key: "resume", title: "Tailor your resume", say: "Tailor my resume for this posting.", note: "Attach your resume. You get a one-page PDF matched to the posting, using only what's true." },
     { key: "prep", title: "Prep for a coffee chat", say: "Prep me for my chat with [name].", note: "When someone replies: a short sheet with their background, your intro and questions to ask." },
@@ -292,7 +292,7 @@
   // ---------- Try it: from applications you've sent to people at those companies ----------
   // On GitHub Pages the API lives on Vercel; on Vercel or locally it's same-origin.
   const API = location.hostname.endsWith("github.io") ? "https://warm-intro-linkedin-outreach-alumni.vercel.app/api/run" : "/api/run";
-  const TRY_FIELDS = ["school", "name", "major", "year"];
+  const TRY_FIELDS = ["school", "name", "major", "year", "hometown", "orgs", "past"];
   const MAX_APPS = 3;
   let result = null;
 
@@ -534,7 +534,6 @@
     store.set(KEYS.form, fields);
     const code = $("t-code").value.trim();
     if (code) store.set(KEYS.code, code);
-    if (!fields.school) { showError("Add your school so we can find your alumni."); $("t-school").focus(); return; }
     if (!fields.apps.length) { showError("Add at least one company you applied to."); $("t-apps").querySelector("input").focus(); return; }
     runSearch(fields);
   });
@@ -556,9 +555,9 @@
   function samplePrep(p, app) {
     const first = p.name.split(" ")[0];
     return {
-      about: `${first} is a ${p.title} at ${app.company} and a ${p.connection.replace(/ · .*/, "")} graduate. (Sample: a live run pulls this from their public profile.)`,
+      about: `${first} is a ${p.title} at ${app.company}. Shared ground: ${p.connection}. (Sample: a live run pulls this from their public profile.)`,
       company_now: `${app.company} is growing its Dallas-Fort Worth team this year. (Sample: a live run uses recent news.)`,
-      intro: `Hi ${first}, thanks for making time. I'm a junior at Texas A&M studying marketing, and I applied for the ${app.role} role. I'd love to hear how you got started at ${app.company} and what the team is like.`,
+      intro: `Hi ${first}, thanks for making time. I'm a marketing junior at Texas A&M, and I applied for the ${app.role} role. I'd love to hear how you got started at ${app.company} and what the team is like.`,
       questions: [
         "What does a typical week look like in your role?",
         `What surprised you most when you started at ${app.company}?`,
@@ -644,14 +643,14 @@
   // ---------- Sample run: a fictional search anyone can watch, instantly and for free ----------
   const SAMPLE = {
     sample: true,
-    summary: "Found 4 people across your 2 applications, 3 of them Texas A&M alumni. Message Jordan first: same school, same team, and a former intern in the program you applied to.",
+    summary: "Found 4 people across your 2 applications: two fellow Aggies, someone from your hometown, and the recruiter. Message Jordan first: same school, same team, and a former intern in the program you applied to.",
     applications: [
       { company: "Acme Foods", role: "Summer 2027 Sales Intern", posting_url: "", people: [
         { name: "Jordan Lee", title: "Sales Coordinator", profile_url: "", connection: "Texas A&M, Class of 2023", why: "On the sales team this internship joins, and a former intern in the same program.", note: "Hi Jordan, fellow Aggie here (junior, marketing). I just applied for Acme's Summer Sales internship. What do you wish you'd known before your internship there?" },
         { name: "Priya Shah", title: "Campus Recruiter", profile_url: "", connection: "Texas A&M, Class of 2021", why: "Recruits for Acme's summer internship program.", note: "Hi Priya, fellow Aggie and marketing junior. I applied for the Summer 2027 Sales internship today. Is there anything you look for that applicants often miss?" },
       ] },
       { company: "Lone Star Beverage", role: "Brand Marketing Intern", posting_url: "", people: [
-        { name: "Marcus Hill", title: "Associate Brand Manager", profile_url: "", connection: "Texas A&M, Class of 2022", why: "On the brand team the internship supports.", note: "Hi Marcus, Gig 'em! I'm a marketing junior who applied to Lone Star's Brand Marketing internship. What does a typical week look like on the brand team?" },
+        { name: "Marcus Hill", title: "Associate Brand Manager", profile_url: "", connection: "Also from Katy, TX", why: "On the brand team the internship supports.", note: "Hi Marcus, fellow Katy native here! I'm a marketing junior who applied to Lone Star's Brand Marketing internship. What does a typical week look like on the brand team?" },
         { name: "Elena Ruiz", title: "Talent Acquisition Partner", profile_url: "", connection: "Recruiter for this role", why: "Listed as the recruiter on the posting.", note: "Hi Elena, I'm a Texas A&M marketing junior and just applied for the Brand Marketing internship. What's the best way to stand out in this year's process?" },
       ] },
     ],
