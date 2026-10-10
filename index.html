@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Warm Intro: AI internship outreach for students</title>
+  <meta name="description" content="A free tool that helps students find open internships, find alumni at those companies, write short LinkedIn messages and track every reply.">
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="top">
+    <div class="top-inner">
+      <a class="brand" href="#home" aria-label="Warm Intro home">
+        <img src="assets/icon.svg" alt="" width="28" height="28">
+        <span>Warm Intro</span>
+      </a>
+      <nav aria-label="Main">
+        <a href="#home" data-route="home">Home</a>
+        <a href="#setup" data-route="setup">Setup</a>
+        <a href="#run" data-route="run">Run it</a>
+        <a href="#tracker" data-route="tracker">Tracker</a>
+        <a href="#about" data-route="about">How it was built</a>
+      </nav>
+      <button class="theme" id="theme" type="button" aria-label="Switch color theme">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+
+    <!-- HOME -->
+    <section class="view" data-view="home" aria-labelledby="home-title">
+      <div class="hero">
+        <p class="eyebrow">Free for students · Runs in Claude</p>
+        <h1 id="home-title">Meet the people who can get you hired.</h1>
+        <p class="lede">Most internships go to people someone already knows. Warm Intro finds open internships, finds alumni from your school at those companies, writes short LinkedIn messages you send yourself, and tracks every reply in one place.</p>
+        <div class="actions">
+          <a class="btn primary" href="#setup">Get started</a>
+          <a class="btn" href="#tracker">Open the tracker</a>
+        </div>
+      </div>
+
+      <div class="stats" role="list">
+        <div class="stat" role="listitem"><b>6–7%</b><span>of applications come from referrals, but they make up 30–50% of hires</span></div>
+        <div class="stat" role="listitem"><b>88%</b><span>of employers call referrals their best source of quality candidates</span></div>
+        <div class="stat" role="listitem"><b>29 vs 39</b><span>days to hire through a referral vs other channels</span></div>
+      </div>
+      <p class="src">Sources: Zippia, SHRM and Forbes Agency Council, compiled by <a href="https://www.chanty.com/blog/employee-referral-statistics/">Chanty</a>.</p>
+
+      <h2>Five steps, one place</h2>
+      <ol class="steps">
+        <li><span class="n">01</span><div><strong>Set your target</strong><p>Role, term, cities and companies, asked one question at a time.</p></div></li>
+        <li><span class="n">02</span><div><strong>Find open internships</strong><p>Every posting is checked on the company's own careers site, so you never chase a closed listing.</p></div></li>
+        <li><span class="n">03</span><div><strong>Find alumni and recruiters</strong><p>People you already know first, then alumni from your school, each one confirmed from their education history.</p></div></li>
+        <li><span class="n">04</span><div><strong>Draft first messages</strong><p>A note that fits LinkedIn's 200-character limit, with one easy question. No referral asks, no flattery.</p></div></li>
+        <li><span class="n">05</span><div><strong>Tailor your resume</strong><p>Rewritten to match the posting, using only what's true.</p></div></li>
+      </ol>
+      <p class="rule">You send every message and every application yourself. The AI does the research; the conversations are yours.</p>
+    </section>
+
+    <!-- SETUP -->
+    <section class="view" data-view="setup" aria-labelledby="setup-title" hidden>
+      <h1 id="setup-title">Setup</h1>
+      <p class="lede">About ten minutes, once. Tick each item as you go; your progress is saved in this browser.</p>
+
+      <ol class="checklist" id="setup-list">
+        <li>
+          <label><input type="checkbox" data-check="claude"> <strong>Create a Claude account</strong></label>
+          <p>The free plan works. <a href="https://claude.ai" target="_blank" rel="noopener">Open Claude</a></p>
+        </li>
+        <li>
+          <label><input type="checkbox" data-check="clay"> <strong>Sign up for Clay (free, optional)</strong></label>
+          <p>Clay finds alumni at each company. The free plan includes 100 data credits and 500 actions a month, enough for a few batches. <a href="https://app.clay.com/signup" target="_blank" rel="noopener">Sign up for Clay free</a>. Then connect it in Claude under Settings, Connectors. Without Clay, the tool uses web search instead.</p>
+        </li>
+        <li>
+          <label><input type="checkbox" data-check="linkedin"> <strong>Request your LinkedIn connections</strong></label>
+          <p>So the tool can start with people you already know. On LinkedIn (desktop): Me, Settings &amp; Privacy, Data privacy, Get a copy of your data. Choose Connections if it's listed, otherwise the larger archive. LinkedIn emails a download link. Share only <code>Connections.csv</code>, never the whole archive.</p>
+        </li>
+        <li>
+          <label><input type="checkbox" data-check="resume"> <strong>Have your resume ready</strong></label>
+          <p>A PDF or plain text, if you want it tailored to a posting.</p>
+        </li>
+      </ol>
+      <div class="actions"><a class="btn primary" href="#run">Next: run it</a></div>
+    </section>
+
+    <!-- RUN -->
+    <section class="view" data-view="run" aria-labelledby="run-title" hidden>
+      <h1 id="run-title">Run it</h1>
+      <p class="lede">Copy the skill into a new Claude chat, then work through the steps. Claude asks the questions; each card below tells you what to say to move on.</p>
+
+      <div class="card start">
+        <div>
+          <h2>1. Give Claude the skill</h2>
+          <p>Copy the skill, open a new Claude chat, paste it in and send. Or download it and add it as a skill in Claude's settings.</p>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="copy-skill" type="button">Copy skill</button>
+          <a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener">Open a new chat</a>
+          <a class="btn" href="skill/SKILL.md" download>Download SKILL.md</a>
+        </div>
+      </div>
+
+      <h2>2. Work through the steps</h2>
+      <ol class="run-steps" id="run-steps"></ol>
+
+      <details class="peek">
+        <summary>Read the full skill</summary>
+        <pre id="skill-text">Loading…</pre>
+      </details>
+    </section>
+
+    <!-- TRACKER -->
+    <section class="view" data-view="tracker" aria-labelledby="tracker-title" hidden>
+      <div class="sec-head">
+        <div>
+          <h1 id="tracker-title">Tracker</h1>
+          <p class="lede">Every message and application in one place. Change a status and the numbers update. Saved in this browser only.</p>
+        </div>
+      </div>
+
+      <div class="funnels">
+        <div class="funnel">
+          <span class="label">People</span>
+          <div class="fsteps">
+            <div class="fstep"><span class="num" id="n-sent">0</span><span>messages sent</span></div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="fstep"><span class="num" id="n-replied">0</span><span>replies</span></div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="fstep"><span class="num" id="n-chat">0</span><span>coffee chats</span></div>
+          </div>
+        </div>
+        <div class="funnel">
+          <span class="label">Applications</span>
+          <div class="fsteps">
+            <div class="fstep"><span class="num" id="n-apps">0</span><span>applied</span></div>
+            <span class="arrow" aria-hidden="true">→</span>
+            <div class="fstep"><span class="num" id="n-int">0</span><span>interviews</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="post">
+        <p><span class="label">For your LinkedIn post</span><span id="post-line" aria-live="polite"></span></p>
+        <button class="btn" id="copy-post" type="button">Copy</button>
+      </div>
+
+      <h2 id="people-h">People <span class="count" id="c-people"></span></h2>
+      <div class="table" role="region" aria-labelledby="people-h" tabindex="0">
+        <table>
+          <thead><tr><th scope="col">Person</th><th scope="col">Company</th><th scope="col">Sent</th><th scope="col">Status</th><th scope="col"><span class="sr">Remove</span></th></tr></thead>
+          <tbody id="people"></tbody>
+        </table>
+      </div>
+
+      <h2 id="apps-h">Applications <span class="count" id="c-apps"></span></h2>
+      <div class="table" role="region" aria-labelledby="apps-h" tabindex="0">
+        <table>
+          <thead><tr><th scope="col">Role</th><th scope="col">Company</th><th scope="col">Applied</th><th scope="col">Status</th><th scope="col"><span class="sr">Remove</span></th></tr></thead>
+          <tbody id="apps"></tbody>
+        </table>
+      </div>
+
+      <details class="add" id="add-box">
+        <summary>Add a message or application</summary>
+        <form id="add-form">
+          <label>Type
+            <select id="f-kind"><option value="person">Message to a person</option><option value="application">Application</option></select>
+          </label>
+          <label>Name or role<input id="f-name" required placeholder="Jordan Lee"></label>
+          <label>Company<input id="f-company" required placeholder="Acme Foods"></label>
+          <label>Title or note<input id="f-detail" placeholder="Sales Coordinator, class of 2023"></label>
+          <label>Link<input id="f-link" type="url" placeholder="https://linkedin.com/in/…"></label>
+          <label>Date<input id="f-date" type="date"></label>
+          <button class="btn primary" type="submit">Add</button>
+        </form>
+      </details>
+
+      <div class="tools">
+        <button class="btn" id="export-csv" type="button">Export CSV</button>
+        <button class="btn" id="export-json" type="button">Back up</button>
+        <label class="btn file">Restore<input type="file" id="import-json" accept="application/json"></label>
+        <button class="btn" id="sample" type="button">Try with sample data</button>
+        <button class="btn danger" id="clear" type="button">Clear all</button>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="view prose" data-view="about" aria-labelledby="about-title" hidden>
+      <h1 id="about-title">How it was built</h1>
+      <p class="lede">I built Warm Intro during my own Summer 2027 internship search as a junior marketing major at Texas A&amp;M. Every rule in it came from something that went wrong or right in real use.</p>
+
+      <h2>The problem</h2>
+      <p>Applying online feels like sending resumes into a void. Referrals are a small share of applications but a large share of hires, yet most students don't know who to message or what to say. I wanted a tool that does the research and leaves the conversations to me.</p>
+
+      <h2>How it works</h2>
+      <figure class="diagram">
+        <svg viewBox="0 0 720 150" role="img" aria-labelledby="dg-t">
+          <title id="dg-t">Flow: you answer questions, Claude runs the skill using Clay and web search, you get postings, people and drafts, you send messages and log them in the tracker.</title>
+          <g class="dg-box"><rect x="4" y="40" width="130" height="70" rx="10"/><text x="69" y="70">You</text><text x="69" y="90" class="sm">answer 10 questions</text></g>
+          <g class="dg-box accent"><rect x="178" y="20" width="170" height="110" rx="10"/><text x="263" y="58">Claude + skill</text><text x="263" y="80" class="sm">Clay for alumni</text><text x="263" y="98" class="sm">web for postings</text></g>
+          <g class="dg-box"><rect x="392" y="40" width="150" height="70" rx="10"/><text x="467" y="70">Postings, people</text><text x="467" y="90" class="sm">and message drafts</text></g>
+          <g class="dg-box"><rect x="586" y="40" width="130" height="70" rx="10"/><text x="651" y="70">You send</text><text x="651" y="90" class="sm">and log replies</text></g>
+          <path class="dg-arrow" d="M136 75h30M350 75h30M544 75h30"/>
+          <path class="dg-head" d="M166 69l8 6-8 6zM380 69l8 6-8 6zM574 69l8 6-8 6z"/>
+        </svg>
+      </figure>
+
+      <h2>Decisions that came from testing</h2>
+      <ul>
+        <li><strong>Check postings on the company's own site.</strong> Job boards keep closed and last-year listings up. A posting only counts if its application page loads and its title matches the right term.</li>
+        <li><strong>Identify companies by LinkedIn URL, not web domain.</strong> In testing, searching by domain matched the wrong company: pga.org returned a small fund in Florida and topgolf.com returned Topgolf Abu Dhabi.</li>
+        <li><strong>Confirm every alumnus one by one.</strong> Clay's school filter matched loosely and returned people from other schools. Similar names don't count either: Texas A&amp;M-Commerce is not Texas A&amp;M. About 1 in 9 current marketing and recruiting staff at a target company turned out to be alumni.</li>
+        <li><strong>Prefer recent graduates.</strong> People 1 to 4 years out remember the internship search and are more likely to reply.</li>
+        <li><strong>Ask one easy question, not for a call.</strong> The first message asks something a person can answer in a reply. A 15-minute chat comes only after they respond.</li>
+        <li><strong>Apply first, then message the same day.</strong> Programs review applications as they arrive, so waiting on a referral is the bigger risk.</li>
+        <li><strong>Be honest about tools.</strong> I tested Apollo as a second people source and found its people search needs a paid plan, so the setup now says so instead of promising it's free.</li>
+      </ul>
+
+      <h2>Results so far</h2>
+      <p>On my own search: 10 open Dallas-Fort Worth internships found and verified, 3 applications, 6 LinkedIn messages sent and 1 reply, all logged in the tracker.</p>
+
+      <h2>What's next</h2>
+      <ul>
+        <li>Feedback from other students testing it.</li>
+        <li>A desktop version.</li>
+      </ul>
+
+      <p class="src">Adapted from <a href="https://vault.angussewell.com/resources/88">Use AI to Meet People at Companies You Want to Work For</a> by Angus the Nontechnical. Source code on <a id="repo-link" href="https://github.com/blemons445/Warm-Intro-Linkedin-Outreach-Alumni-Network">GitHub</a>.</p>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Built by Bruce Hinson, Texas A&amp;M. You send every message yourself.</p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" hidden></div>
+  <script src="assets/app.js"></script>
+</body>
+</html>
