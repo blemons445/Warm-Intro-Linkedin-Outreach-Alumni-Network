@@ -19,7 +19,7 @@ Referrals are only 6 to 7% of job applications but 30 to 50% of hires ([Chanty](
 | 1. Set your target | Claude asks about ten short questions: cities, role, term, companies, school and year. |
 | 2. Find open internships | Every posting is checked on the company's own careers site, with the best match flagged. |
 | 3. Find people to message | People you share something with first (school, hometown, clubs, past jobs), then former interns, the team and recruiters, each confirmed from a source. |
-| 4. Draft first messages | A connection note under LinkedIn's 200-character limit, with one easy question. No referral asks. |
+| 4. Draft first messages | A connection note under LinkedIn's 200-character limit: who you are, the role, one detail from their profile, and a 15-minute chat ask. No referral asks. |
 | 5. Tailor your resume | Rewritten to match the posting using only what's true, as a one-page PDF. |
 | Tracker | Every message and application with its status, plus totals for a LinkedIn post. |
 | Chat prep | When someone replies: their background, your 20-second intro and questions to ask. |

@@ -712,7 +712,7 @@ For each job, find the posting link and 2 to 4 real people there to message, wit
 
 Also try hard to find the likely hiring manager, the person the role reports to: check the posting for a named contact or reporting line, search LinkedIn for that manager title on that team in that city, and look for posts from people there saying they're hiring for this role. List them first with "hiring_manager":true (at most one per job) and say in "why" how you know.
 
-For each person, write a LinkedIn note under 200 characters: what we share, that I applied, and one easy question.
+For each person, write a LinkedIn note under 200 characters in this order: who I am (school, year, major), the exact role I applied for, one specific detail from their profile (if they were promoted or had a clear win, congratulate them on it; otherwise a career move or the brand they work on), and a friendly ask for a quick 15-min chat about their role and how they got there. Example: "Hi Kinsey, A&M marketing junior here, just applied for KDP's Sales Analyst internship. Saw you moved from PepsiCo to KDP, congrats on the promotion! Open to a quick 15-min chat about that jump?"
 
 End with only this JSON in a code block:
 {"summary":"","applications":[{"company":"","role":"","posting_url":"","people":[{"name":"","title":"","profile_url":"","hiring_manager":false,"other_team":false,"connection":"","why":"","note":""}]}]}`;
