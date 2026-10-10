@@ -318,3 +318,9 @@ details.more[open] summary { margin-bottom: 12px; }
 @media (max-width: 720px) {
   .try-grid, .res-list { grid-template-columns: minmax(0, 1fr); }
 }
+.sample-note { background: var(--chip-bg); color: var(--chip-fg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; font-size: 0.9rem; font-weight: 500; margin-bottom: 10px; }
+.t-error p { color: var(--bad); }
+.t-error .btn { justify-self: start; }
+.recruit { display: grid; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--cta); border-radius: 12px; box-shadow: var(--shadow); padding: 24px; }
+.recruit p:not(.kicker) { color: var(--muted); max-width: 62ch; margin-top: 8px; }
+.recruit .actions { gap: 8px; }

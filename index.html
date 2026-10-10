@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/style.css?v=3.0">
+  <link rel="stylesheet" href="assets/style.css?v=3.1">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -45,7 +45,7 @@
           <p class="lede">Warm Intro finds open internships, finds alumni from your school at those companies, and writes short LinkedIn messages you send yourself. Then it tracks every reply.</p>
           <div class="actions">
             <a class="btn primary lg" href="#try">Try it free</a>
-            <a class="btn lg" href="#about">See how it works</a>
+            <a class="btn lg" href="#try" data-demo>Watch a sample run</a>
           </div>
           <p class="trust"><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> No account needed</span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> You send every message</span></p>
         </div>
@@ -135,6 +135,20 @@
         <details><summary>Does it work for any school?</summary><p>Yes. It was built at Texas A&amp;M, but you tell it your school and it searches for your alumni.</p></details>
       </section>
 
+      <section class="recruit" aria-labelledby="recruit-h">
+        <div>
+          <p class="kicker">Reviewing my work?</p>
+          <h2 id="recruit-h">Built by Bruce Hinson, Texas A&amp;M marketing</h2>
+          <p>I built Warm Intro during my own internship search: the Claude skill, this site, and a serverless backend that runs the search. The case study covers the decisions and what testing changed.</p>
+        </div>
+        <div class="actions">
+          <a class="btn primary" href="#try" data-demo>Watch a sample run</a>
+          <a class="btn" href="#about">Read the case study</a>
+          <a class="btn" href="https://github.com/blemons445/Warm-Intro-Linkedin-Outreach-Alumni-Network" target="_blank" rel="noopener">View the code</a>
+          <a class="btn" href="#connect">Connect with me</a>
+        </div>
+      </section>
+
       <div class="band">
         <div><h2>Your next internship starts with one message.</h2><p>Three fields, a couple of minutes, no account.</p></div>
         <a class="btn onband lg" href="#try">Try it free</a>
@@ -164,8 +178,9 @@
         </details>
         <div class="actions">
           <button class="btn primary lg" id="t-go" type="submit">Find my people</button>
-          <span class="src">Free. No account. You send every message yourself.</span>
+          <button class="btn lg" type="button" data-demo>Watch a sample run</button>
         </div>
+        <p class="src">Free, with no account. You send every message yourself.</p>
       </form>
 
       <div class="card progress" id="t-progress" hidden aria-live="polite">
@@ -173,9 +188,10 @@
         <ol class="pg-log" id="t-log"></ol>
       </div>
 
-      <div class="card t-error" id="t-error" role="alert" hidden></div>
+      <div class="card t-error" id="t-error" role="alert" hidden><p id="t-error-msg"></p><button class="btn small" type="button" data-demo>Watch a sample run instead</button></div>
 
       <div id="t-results" hidden>
+        <p class="sample-note" id="t-sample" hidden>Sample run with fictional companies and people, so you can see what a real search returns.</p>
         <div class="res-head">
           <p class="summary" id="t-summary"></p>
           <div class="actions">
@@ -392,6 +408,6 @@
   </footer>
 
   <div class="toast" id="toast" role="status" hidden></div>
-  <script src="assets/app.js?v=3.0"></script>
+  <script src="assets/app.js?v=3.1"></script>
 </body>
 </html>

@@ -7,6 +7,7 @@ How Warm Intro got to where it is. Each change came from using it on a real inte
 - Copying a note adds that person to the tracker; "I applied" logs the application. Results stay on the page after a refresh.
 - Added a Vercel backend that calls Claude with web search and a strict result schema. The key stays on the server, with a per-visitor hourly limit.
 - The original skill is still there under **Use in Claude** for deeper searches with Clay.
+- Added "Watch a sample run", which replays a fictional search instantly with no API call, and a home section for recruiters with links to the case study, code and contact.
 
 ## 1.0.0 (Oct 10, 2026): Web app
 - Combined everything into one web app: setup checklist, guided run, tracker and a "How it was built" page.

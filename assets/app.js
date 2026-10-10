@@ -331,7 +331,7 @@
     c.append(top);
     if (p.why) c.append(el("p", "why", p.why));
     const acts = el("div", "actions");
-    const url = safeUrl(p.url);
+    const url = result.sample ? "" : safeUrl(p.url);
     if (url) { const a = el("a", "btn primary small", "Open posting"); a.href = url; a.target = "_blank"; a.rel = "noopener"; acts.append(a); }
     const b = el("button", "btn small", "I applied");
     b.type = "button";
@@ -361,7 +361,7 @@
       const n = note.value.length; count.textContent = `${n} / 200`; count.classList.toggle("over", n > 200); p.note = note.value;
       if (note.offsetParent) { note.style.height = "auto"; note.style.height = `${note.scrollHeight + 2}px`; }
     };
-    note.addEventListener("input", () => { upd(); store.set(KEYS.last, result); });
+    note.addEventListener("input", () => { upd(); if (!result.sample) store.set(KEYS.last, result); });
     upd();
     c.append(note, count);
     const acts = el("div", "actions");
@@ -378,7 +378,7 @@
     const prof = el("a", "btn small", safeUrl(p.profile_url) ? "Open profile" : "Find on LinkedIn");
     prof.href = safeUrl(p.profile_url) || linkedinSearch(p);
     prof.target = "_blank"; prof.rel = "noopener";
-    acts.append(copy, prof, add);
+    if (result.sample) acts.append(copy, add); else acts.append(copy, prof, add);
     c.append(acts);
     return c;
   }
@@ -387,6 +387,7 @@
     const r = result;
     $("t-results").hidden = !r;
     if (!r) return;
+    $("t-sample").hidden = !r.sample;
     $("t-summary").textContent = r.summary || "";
     const post = r.postings || [], ppl = r.people || [];
     $("t-c-post").textContent = post.length ? `· ${post.length}` : "";
@@ -442,7 +443,7 @@
       $("t-results").scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
       const msg = err instanceof TypeError ? "Couldn't reach the search service. Check your connection and try again." : err.message;
-      $("t-error").textContent = msg;
+      $("t-error-msg").textContent = msg;
       $("t-error").hidden = false;
     } finally {
       setBusy(false);
@@ -469,6 +470,47 @@
     result = null; store.set(KEYS.last, null); renderResults();
     $("t-school").focus();
   });
+
+  // Sample run: replays a fictional search so anyone (recruiters included) can see the output instantly.
+  const SAMPLE = {
+    sample: true,
+    summary: "Found 2 open internships in Dallas-Fort Worth and 3 alumni at those companies. Apply to the Acme Foods role first; its deadline is closest.",
+    postings: [
+      { company: "Acme Foods", title: "Summer 2027 Sales Intern", location: "Dallas, TX", url: "", status: "Open · closes Nov 15", why: "Field sales with a category marketing project, open to marketing juniors." },
+      { company: "Lone Star Beverage", title: "Brand Marketing Intern", location: "Plano, TX", url: "", status: "Open", why: "Brand team for a regional drinks portfolio; asks for retail or social media experience." },
+    ],
+    people: [
+      { name: "Jordan Lee", title: "Sales Coordinator", company: "Acme Foods", profile_url: "", connection: "Texas A&M, Class of 2023 · former intern", note: "Hi Jordan, fellow Aggie here (junior, marketing). I just applied for Acme's Summer Sales internship. What do you wish you'd known before your internship there?" },
+      { name: "Priya Shah", title: "Campus Recruiter", company: "Acme Foods", profile_url: "", connection: "Texas A&M, Class of 2021", note: "Hi Priya, fellow Aggie and marketing junior. I applied for the Summer 2027 Sales internship today. Is there anything you look for that applicants often miss?" },
+      { name: "Marcus Hill", title: "Associate Brand Manager", company: "Lone Star Beverage", profile_url: "", connection: "Texas A&M, Class of 2022", note: "Hi Marcus, Gig 'em! I'm a marketing junior applying to Lone Star's Brand Marketing internship. What does a typical week look like on the brand team?" },
+    ],
+  };
+  const SAMPLE_STEPS = [
+    "Reading your target",
+    "Searching: sales marketing internship Dallas summer 2027",
+    "Searching: Acme Foods careers internship",
+    "Searching: Lone Star Beverage brand marketing intern",
+    "Searching: Texas A&M Acme Foods LinkedIn",
+    "Searching: Texas A&M Lone Star Beverage brand manager",
+    "Drafting notes",
+  ];
+  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+  async function runSample() {
+    if (location.hash !== "#try") location.hash = "try";
+    $("t-error").hidden = true;
+    $("t-log").replaceChildren();
+    result = null; renderResults();
+    setBusy(true);
+    $("t-progress").scrollIntoView({ behavior: "smooth", block: "center" });
+    const fast = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    for (const step of SAMPLE_STEPS) { logLine(step); await wait(fast ? 60 : 450); }
+    setBusy(false);
+    result = structuredClone(SAMPLE);
+    renderResults();
+    $("t-results").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+  document.querySelectorAll("[data-demo]").forEach((b) => b.addEventListener("click", (e) => { e.preventDefault(); runSample(); }));
 
   result = store.get(KEYS.last, null);
 
