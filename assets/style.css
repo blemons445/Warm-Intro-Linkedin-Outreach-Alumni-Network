@@ -196,9 +196,11 @@ main:focus, main:focus-visible { outline: none; }
 .trust { display: flex; align-items: center; gap: 6px 16px; flex-wrap: wrap; color: var(--muted); font-size: 0.9rem; }
 .trust svg { color: var(--good); }
 .preview { isolation: isolate; position: relative; display: grid; gap: 14px; padding: 24px 0; }
-.rings { position: absolute; inset: -8% 0; z-index: -1; background:
-  radial-gradient(circle at 60% 50%, transparent 0 28%, var(--line) 28% 28.4%, transparent 28.6% 40%, var(--line) 40% 40.4%, transparent 40.6% 52%, var(--line) 52% 52.4%, transparent 52.6%),
-  radial-gradient(circle at 60% 50%, var(--accent-soft), transparent 60%); }
+.rings { position: absolute; left: 50%; top: 50%; width: min(118%, 620px, 100vw); aspect-ratio: 1; transform: translate(-50%, -50%); z-index: -1; border-radius: 50%; pointer-events: none; background:
+  radial-gradient(circle closest-side, transparent 0 54%, var(--line) 54% 54.6%, transparent 55% 76%, var(--line) 76% 76.6%, transparent 77% 98%, var(--line) 98% 98.6%, transparent 99%),
+  radial-gradient(circle closest-side, var(--accent-soft), transparent 80%); }
+/* Hide the browser's datalist arrow; suggestions still appear as you type. */
+input[list]::-webkit-calendar-picker-indicator { display: none !important; }
 .pv-card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); display: grid; gap: 10px; }
 .pv-a { margin-right: 32px; }
 .pv-b { margin-left: 48px; }

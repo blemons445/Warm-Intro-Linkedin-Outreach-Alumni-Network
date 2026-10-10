@@ -682,8 +682,8 @@
 
   // ---------- Free runs: the visitor's own Claude or ChatGPT does the search ----------
   const AI = {
-    // Claude shows a "use caution" banner on link-prefilled prompts, so open a blank chat and let the visitor paste.
-    claude: { name: "Claude", paste: true, url: () => "https://claude.ai/new" },
+    // Claude may show a "use caution" banner above link-filled prompts; that's expected, and the visitor still presses Send.
+    claude: { name: "Claude", url: (q) => `https://claude.ai/new?q=${encodeURIComponent(q)}` },
     chatgpt: { name: "ChatGPT", url: (q) => `https://chatgpt.com/?hints=search&q=${encodeURIComponent(q)}` },
   };
 
