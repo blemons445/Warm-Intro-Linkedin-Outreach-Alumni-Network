@@ -167,3 +167,4 @@ form input, form select { font: inherit; color: var(--fg); border: 1px solid var
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
 main:focus, main:focus-visible { outline: none; }
 .dg-head { fill: var(--accent); }
+.foot a { color: inherit; }

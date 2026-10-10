@@ -41,7 +41,7 @@
   });
 
   // ---------- Routing ----------
-  const ROUTES = ["home", "setup", "run", "tracker", "about"];
+  const ROUTES = ["home", "setup", "run", "tracker", "about", "connect"];
   function route() {
     const name = ROUTES.includes(location.hash.slice(1)) ? location.hash.slice(1) : "home";
     document.querySelectorAll(".view").forEach((v) => { v.hidden = v.dataset.view !== name; });
