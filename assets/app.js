@@ -50,7 +50,7 @@
       else a.removeAttribute("aria-current");
     });
     const view = document.querySelector(`[data-view="${name}"] h1`);
-    document.title = (name === "home" ? "Past the Post: meet the people behind your applications" : `${view.textContent} · Past the Post`);
+    document.title = (name === "home" ? "Past the Post: Meet the people behind your applications" : `${view.textContent} · Past the Post`);
     if (route.ready) { window.scrollTo(0, 0); $("main").focus({ preventScroll: true }); }
     route.ready = true;
     if (name === "try") document.querySelectorAll("#t-groups .note").forEach((n) => n.dispatchEvent(new Event("input")));
