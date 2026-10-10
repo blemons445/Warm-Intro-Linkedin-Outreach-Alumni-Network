@@ -3,7 +3,7 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
-  const KEYS = { theme: "wi-theme", checks: "wi-checks", rows: "wi-rows", form: "wi-form", last: "wi-last" };
+  const KEYS = { theme: "wi-theme", checks: "wi-checks", rows: "wi-rows", form: "wi-form", last: "wi-last", code: "wi-code" };
 
   // Storage can be blocked (private windows, strict settings); the app still works for the session.
   const store = {
@@ -296,6 +296,15 @@
   const savedForm = store.get(KEYS.form, {});
   TRY_FIELDS.forEach((k) => { if (savedForm[k]) $(`t-${k}`).value = savedForm[k]; });
 
+  // Access code: a shared link like ?code=XYZ#try fills it in, so whoever gets the link never types it.
+  const urlCode = new URLSearchParams(location.search).get("code");
+  if (urlCode) {
+    store.set(KEYS.code, urlCode);
+    history.replaceState(null, "", location.pathname + location.hash);
+  }
+  $("t-code").value = store.get(KEYS.code, "") || "";
+  const showCode = () => { $("t-code-row").hidden = false; };
+
   function el(tag, cls, text) {
     const e = document.createElement(tag);
     if (cls) e.className = cls;
@@ -419,6 +428,7 @@
       const res = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields) });
       if (!res.ok || !res.body) {
         const data = await res.json().catch(() => ({}));
+        if (data.code_required) { showCode(); $("t-code").focus(); }
         throw new Error(data.error || "Something went wrong. Try again.");
       }
       const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
@@ -455,6 +465,8 @@
     const fields = {};
     TRY_FIELDS.forEach((k) => { fields[k] = $(`t-${k}`).value.trim(); });
     store.set(KEYS.form, fields);
+    fields.code = $("t-code").value.trim();
+    if (fields.code) store.set(KEYS.code, fields.code);
     runSearch(fields);
   });
 

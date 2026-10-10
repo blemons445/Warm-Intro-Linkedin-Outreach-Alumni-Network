@@ -324,3 +324,4 @@ details.more[open] summary { margin-bottom: 12px; }
 .recruit { display: grid; gap: 16px; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--cta); border-radius: 12px; box-shadow: var(--shadow); padding: 24px; }
 .recruit p:not(.kicker) { color: var(--muted); max-width: 62ch; margin-top: 8px; }
 .recruit .actions { gap: 8px; }
+.code-row { max-width: 320px; font-weight: 500; color: var(--fg); }

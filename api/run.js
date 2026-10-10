@@ -10,7 +10,7 @@ const ALLOWED_ORIGINS = [
 ];
 
 const FIELDS = {
-  school: 80, major: 60, year: 20, city: 60, kind: 80, term: 30, companies: 200, name: 60,
+  school: 80, major: 60, year: 20, city: 60, kind: 80, term: 30, companies: 200, name: 60, code: 60,
 };
 
 // Light per-instance throttle so one visitor can't run up the bill.
@@ -114,6 +114,12 @@ export async function POST(request) {
   let f;
   try { f = clean(await request.json()); } catch { return json(400, { error: "Bad request." }); }
   if (!f.school || !f.kind || !f.city) return json(400, { error: "School, internship type and city are required." });
+
+  // Optional: set ACCESS_CODE in Vercel to limit live searches to people you've given the code.
+  const code = process.env.ACCESS_CODE;
+  if (code && f.code.toLowerCase() !== code.toLowerCase()) {
+    return json(401, { error: f.code ? "That access code didn't work." : "Live search needs an access code.", code_required: true });
+  }
 
   const ip = (request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
   const now = Date.now();

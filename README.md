@@ -38,7 +38,7 @@ Warm Intro is two parts:
 
 - **The skill** ([`skill/SKILL.md`](skill/SKILL.md)): the instructions Claude follows. It uses Clay to find people and web search to check postings.
 - **The web app** (`index.html`, `assets/`): a plain HTML, CSS and JavaScript site with no build step. It runs the one-page search, hands the skill to Claude for deeper runs, and keeps the tracker.
-- **The backend** ([`api/run.js`](api/run.js)): one Vercel serverless function. It calls the Claude API with web search and a strict output schema, streams progress to the page as it searches, and returns postings, people and notes as JSON. The API key stays on the server, and each visitor is limited to a few searches an hour.
+- **The backend** ([`api/run.js`](api/run.js)): one Vercel serverless function. It calls the Claude API with web search and a strict output schema, streams progress to the page as it searches, and returns postings, people and notes as JSON. The API key stays on the server, each visitor is limited to a few searches an hour, and an optional `ACCESS_CODE` limits live search to people who have the code (a link with `?code=` fills it in).
 
 ### Decisions that came from testing
 
