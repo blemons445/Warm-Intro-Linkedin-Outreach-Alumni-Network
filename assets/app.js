@@ -707,7 +707,7 @@ ${apps}
 About me:
 ${aboutYou(f)}
 
-For each job, find the posting link and 2 to 4 real people there to message, with their LinkedIn profile links. Put people who share something with me first (school, hometown, club, past job), then former interns, the team and the recruiter. Only include people you found a source for.
+For each job, find the posting link and 2 to 4 real people there to message, with their LinkedIn profile links. Stay in the same function as the role: for a marketing role, people in marketing or brand; for a sales role, people in sales. Among those, put people who share something with me first (school, hometown, club, past job), then former interns of that program, then the recruiter. Skip people in unrelated functions (like supply chain for a marketing role) even if we share a school, unless they recruit for the role. Only include people you found a source for.
 
 Also try hard to find the likely hiring manager, the person the role reports to: check the posting for a named contact or reporting line, search LinkedIn for that manager title on that team in that city, and look for posts from people there saying they're hiring for this role. List them first with "hiring_manager":true (at most one per job) and say in "why" how you know.
 
