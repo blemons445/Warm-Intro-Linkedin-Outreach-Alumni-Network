@@ -4,7 +4,7 @@
 
 **Turn applications into conversations.** You tell Past the Post where you've applied. It finds people at each company you share something with (school, hometown, clubs, past jobs), plus the team and recruiters, links their LinkedIn profiles, drafts a short first message, and helps you turn replies into coffee chats and referrals. It isn't a job board: Simplify and others already find jobs. Past the Post starts after you apply.
 
-**Live app:** https://warm-intro-linkedin-outreach-alumni.vercel.app/
+**Live app:** https://past-the-post.vercel.app/
 
 ![Past the Post tracker](docs/tracker.png)
 
@@ -28,7 +28,7 @@ You send every message and every application yourself. The tool never sends, app
 
 ## How to use it
 
-**Fastest:** open the [live app](https://warm-intro-linkedin-outreach-alumni.vercel.app/#try), add your school and the jobs you applied to (or fill them from your tracker), and press **Find my people**. For each application you get the posting link plus people with LinkedIn links and a drafted note. When someone replies, "prep me" builds a coffee chat sheet that ends with a referral ask. **Watch a sample run** shows the whole flow without a search.
+**Fastest:** open the [live app](https://past-the-post.vercel.app/#try), add your school and the jobs you applied to (or fill them from your tracker), and press **Find my people**. For each application you get the posting link plus people with LinkedIn links and a drafted note. When someone replies, "prep me" builds a coffee chat sheet that ends with a referral ask. **Watch a sample run** shows the whole flow without a search.
 
 **Deeper search in Claude:** on **Use in Claude**, do the one-time setup (a free Claude account, optionally a free [Clay](https://app.clay.com/signup) account), copy the skill into a new chat and say "Help me find an internship."
 

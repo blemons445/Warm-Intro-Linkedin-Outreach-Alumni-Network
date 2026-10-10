@@ -6,6 +6,7 @@ const client = new Anthropic(); // reads ANTHROPIC_API_KEY
 
 const ALLOWED_ORIGINS = [
   "https://blemons445.github.io",
+  "https://past-the-post.vercel.app",
   "https://warm-intro-linkedin-outreach-alumni.vercel.app",
 ];
 

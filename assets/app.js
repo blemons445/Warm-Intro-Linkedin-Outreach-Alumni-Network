@@ -291,7 +291,7 @@
 
   // ---------- Try it: from applications you've sent to people at those companies ----------
   // On GitHub Pages the API lives on Vercel; on Vercel or locally it's same-origin.
-  const API = location.hostname.endsWith("github.io") ? "https://warm-intro-linkedin-outreach-alumni.vercel.app/api/run" : "/api/run";
+  const API = location.hostname.endsWith("github.io") ? "https://past-the-post.vercel.app/api/run" : "/api/run";
   const TRY_FIELDS = ["school", "name", "major", "year", "hometown", "orgs", "past"];
   const MAX_APPS = 3;
   let result = null;
