@@ -305,12 +305,25 @@
   const safeUrl = (u) => (/^https:\/\//i.test(u || "") ? u : "");
 
   // Application rows: company, role, optional posting link.
+  // Free type-ahead for Company and Role: a built-in list plus whatever is in your tracker.
+  const COMPANIES = ["7-Eleven", "Anheuser-Busch", "Aramark", "Ben E. Keith", "Blue Bell Creameries", "Boston Beer Company", "Brinker International", "Brown-Forman", "Campbell's", "Cargill", "Celsius Holdings", "Chick-fil-A", "Chobani", "Coca-Cola", "Coca-Cola Southwest Beverages", "Colgate-Palmolive", "Conagra Brands", "Constellation Brands", "Costco", "Danone", "Darden", "Del Monte Foods", "Diageo", "Domino's", "Dr Pepper Snapple", "E. & J. Gallo Winery", "Ferrero", "Frito-Lay", "General Mills", "Gatorade", "H-E-B", "Heineken", "Hershey", "Hormel Foods", "Imperial Sugar", "J.M. Smucker", "JBS USA", "Kellanova", "Keurig Dr Pepper", "Kimberly-Clark", "Kraft Heinz", "Kroger", "L'Oréal", "Lamb Weston", "Land O'Lakes", "Mars", "McCormick", "McLane Company", "Molson Coors", "Mondelez International", "Monster Beverage", "Nestlé", "Nestlé Purina", "Ocean Spray", "Olipop", "PepsiCo", "Pilgrim's Pride", "Post Holdings", "Procter & Gamble", "Red Bull", "Reyes Coca-Cola Bottling", "Sanderson Farms", "Southern Glazer's Wine & Spirits", "Starbucks", "Sysco", "Target", "Topo Chico", "Tyson Foods", "Unilever", "US Foods", "Walmart", "Whataburger", "Yum! Brands"];
+  const ROLES = ["Brand Marketing Intern", "Business Development Intern", "Category Management Intern", "Consumer Insights Intern", "Customer Marketing Intern", "Digital Marketing Intern", "Field Marketing Intern", "Field Sales Intern", "Marketing Intern", "National Accounts Intern", "Operations Intern", "Product Marketing Intern", "Revenue Management Intern", "Sales Analyst Intern", "Sales Intern", "Shopper Marketing Intern", "Social Media Intern", "Supply Chain Intern", "Trade Marketing Intern"];
+  function suggestList(id, base, key) {
+    let dl = document.getElementById(id);
+    if (!dl) { dl = el("datalist"); dl.id = id; document.body.append(dl); }
+    const mine = rows.filter((r) => r.kind === "application").map((r) => r[key]).filter(Boolean);
+    const all = [...new Set([...mine, ...base])].sort((a, b) => a.localeCompare(b));
+    dl.replaceChildren(...all.map((v) => { const o = el("option"); o.value = v; return o; }));
+  }
+  function refreshSuggestions() { suggestList("dl-company", COMPANIES, "company"); suggestList("dl-role", ROLES, "name"); }
+
   function appRow(a = {}) {
     const row = el("div", "app-row");
     const field = (label, key, ph, type = "text") => {
       const l = el("label", null, label);
       const i = el("input");
       i.type = type; i.dataset.key = key; i.placeholder = ph; i.value = a[key] || ""; i.maxLength = key === "url" ? 300 : 100;
+      if (key !== "url") { i.setAttribute("list", `dl-${key}`); i.autocomplete = "off"; }
       l.append(i);
       return l;
     };
@@ -356,6 +369,7 @@
     $("t-add-app").hidden = n >= MAX_APPS;
     $("t-apps").querySelectorAll(".del").forEach((b) => { b.hidden = n < 2; });
     $("t-from-tracker").hidden = !rows.some((r) => r.kind === "application");
+    refreshSuggestions();
   }
   $("t-add-app").addEventListener("click", () => {
     $("t-apps").append(appRow());
