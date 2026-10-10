@@ -475,12 +475,28 @@
       if (trackPerson(p, app)) { trackApp(app); save(); renderTracker(); markDone(add, "In tracker"); }
     });
     add.addEventListener("click", () => { trackPerson(p, app); trackApp(app); save(); renderTracker(); markDone(add, "In tracker"); toast("Added to your tracker"); });
+    const book = el("button", "btn small ghost", "They said yes: copy times");
+    book.type = "button";
+    book.addEventListener("click", () => copyText(bookingMessage(p), "Copied a reply offering two times. Edit the times if you need to."));
     const prep = el("button", "btn small ghost", "They replied: prep me");
     prep.type = "button";
     prep.addEventListener("click", () => openPrep(p, app, prep));
-    acts.append(copy, prof, add, prep);
+    acts.append(copy, prof, add, book, prep);
     c.append(acts);
     return c;
+  }
+
+  // When they agree to chat, offer two specific times (the reply that booked the first real call).
+  function bookingMessage(p) {
+    const days = [];
+    const d = new Date();
+    d.setDate(d.getDate() + 2);
+    while (days.length < 2) {
+      if (d.getDay() > 0 && d.getDay() < 6) { days.push(d.toLocaleDateString("en-US", { weekday: "long" })); d.setDate(d.getDate() + 2); }
+      else d.setDate(d.getDate() + 1);
+    }
+    const first = (p.name || "").split(/\s+/)[0] || "there";
+    return `Thanks so much, ${first}! Would ${days[0]} at 10:30 or ${days[1]} at 10:30 work for a quick call? Happy to work around your schedule. I can send an invite or call whatever number works best.`;
   }
 
   function appGroup(app) {
