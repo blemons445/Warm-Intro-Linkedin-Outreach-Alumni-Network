@@ -2,6 +2,12 @@
 
 How Warm Intro got to where it is. Each change came from using it on a real internship search.
 
+## 1.1.0 (Oct 10, 2026): One-page search
+- New **Try it** page: three fields and one button. The site searches for open postings and alumni, drafts a note for each person and streams its progress while it works.
+- Copying a note adds that person to the tracker; "I applied" logs the application. Results stay on the page after a refresh.
+- Added a Vercel backend that calls Claude with web search and a strict result schema. The key stays on the server, with a per-visitor hourly limit.
+- The original skill is still there under **Use in Claude** for deeper searches with Clay.
+
 ## 1.0.0 (Oct 10, 2026): Web app
 - Combined everything into one web app: setup checklist, guided run, tracker and a "How it was built" page.
 - Tracker saves in the browser, with CSV export, backup and restore, and sample data for visitors.

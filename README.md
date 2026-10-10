@@ -2,7 +2,7 @@
 
 **AI internship outreach for students.** Warm Intro finds open internships, finds alumni from your school at those companies, drafts short LinkedIn messages you send yourself, and tracks every reply in one place.
 
-**Live app:** https://blemons445.github.io/Warm-Intro-Linkedin-Outreach-Alumni-Network/
+**Live app:** https://warm-intro-linkedin-outreach-alumni.vercel.app/
 
 ![Warm Intro tracker](docs/tracker.png)
 
@@ -26,18 +26,19 @@ You send every message and every application yourself. The tool never sends, app
 
 ## How to use it
 
-1. Open the [live app](https://blemons445.github.io/Warm-Intro-Linkedin-Outreach-Alumni-Network/) and follow **Setup**: a free Claude account, and optionally a free [Clay](https://app.clay.com/signup) account connected to Claude.
-2. On **Run it**, copy the skill into a new Claude chat and say "Help me find an internship."
-3. Log each message and application in the **Tracker**.
+**Fastest:** open the [live app](https://warm-intro-linkedin-outreach-alumni.vercel.app/#try), enter your school, the kind of internship and a city, and press **Find my people**. The site searches, then shows open postings, alumni and a drafted note for each. Copy a note and it's added to your **Tracker**.
 
-No install, no account on this site. The tracker is stored in your own browser; use **Back up** to save a copy.
+**Deeper search in Claude:** on **Use in Claude**, do the one-time setup (a free Claude account, optionally a free [Clay](https://app.clay.com/signup) account), copy the skill into a new chat and say "Help me find an internship."
+
+No install and no account on this site. The tracker is stored in your own browser; use **Back up** to save a copy.
 
 ## How it was built
 
 Warm Intro is two parts:
 
 - **The skill** ([`skill/SKILL.md`](skill/SKILL.md)): the instructions Claude follows. It uses Clay to find people and web search to check postings.
-- **The web app** (`index.html`, `assets/`): a plain HTML, CSS and JavaScript site with no build step, hosted on GitHub Pages. It guides setup, hands the skill to Claude and runs the tracker.
+- **The web app** (`index.html`, `assets/`): a plain HTML, CSS and JavaScript site with no build step. It runs the one-page search, hands the skill to Claude for deeper runs, and keeps the tracker.
+- **The backend** ([`api/run.js`](api/run.js)): one Vercel serverless function. It calls the Claude API with web search and a strict output schema, streams progress to the page as it searches, and returns postings, people and notes as JSON. The API key stays on the server, and each visitor is limited to a few searches an hour.
 
 ### Decisions that came from testing
 
@@ -59,8 +60,10 @@ On my own search: 10 open Dallas-Fort Worth internships found and verified, 3 ap
 ## Run it locally
 
 ```sh
+npm install
+ANTHROPIC_API_KEY=sk-ant-... npx vercel dev
+# or, for the front end only:
 python3 -m http.server 8000
-# open http://localhost:8000
 ```
 
 ## Credits

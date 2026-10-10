@@ -1,9 +1,9 @@
-// Warm Intro: hash routing, setup and run checklists, and a tracker saved in localStorage.
+// Warm Intro: hash routing, the Try it search, setup and run checklists, and a tracker saved in localStorage.
 (() => {
   "use strict";
 
   const $ = (id) => document.getElementById(id);
-  const KEYS = { theme: "wi-theme", checks: "wi-checks", rows: "wi-rows" };
+  const KEYS = { theme: "wi-theme", checks: "wi-checks", rows: "wi-rows", form: "wi-form", last: "wi-last" };
 
   // Storage can be blocked (private windows, strict settings); the app still works for the session.
   const store = {
@@ -41,7 +41,7 @@
   });
 
   // ---------- Routing ----------
-  const ROUTES = ["home", "setup", "run", "tracker", "about", "connect"];
+  const ROUTES = ["home", "try", "setup", "run", "tracker", "about", "connect"];
   function route() {
     const name = ROUTES.includes(location.hash.slice(1)) ? location.hash.slice(1) : "home";
     document.querySelectorAll(".view").forEach((v) => { v.hidden = v.dataset.view !== name; });
@@ -53,6 +53,7 @@
     document.title = (name === "home" ? "Warm Intro: AI internship outreach for students" : `${view.textContent} · Warm Intro`);
     if (route.ready) { window.scrollTo(0, 0); $("main").focus({ preventScroll: true }); }
     route.ready = true;
+    if (name === "try") document.querySelectorAll("#t-people .note").forEach((n) => n.dispatchEvent(new Event("input")));
   }
   window.addEventListener("hashchange", route);
 
@@ -286,8 +287,194 @@
     rows = []; save(); renderTracker(); toast("Cleared");
   });
 
+  // ---------- Try it: the site runs the search ----------
+  // On GitHub Pages the API lives on Vercel; on Vercel or locally it's same-origin.
+  const API = location.hostname.endsWith("github.io") ? "https://warm-intro-linkedin-outreach-alumni.vercel.app/api/run" : "/api/run";
+  const TRY_FIELDS = ["school", "kind", "city", "name", "major", "year", "term", "companies"];
+  let result = null;
+
+  const savedForm = store.get(KEYS.form, {});
+  TRY_FIELDS.forEach((k) => { if (savedForm[k]) $(`t-${k}`).value = savedForm[k]; });
+
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  const safeUrl = (u) => (/^https:\/\//i.test(u || "") ? u : "");
+  const linkedinSearch = (p) => `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(`${p.name} ${p.company}`)}`;
+
+  function inTracker(kind, name, company) {
+    return rows.some((r) => r.kind === kind && r.name.toLowerCase() === name.toLowerCase() && r.company.toLowerCase() === company.toLowerCase());
+  }
+  function track(kind, item) {
+    const name = kind === "person" ? item.name : item.title;
+    if (inTracker(kind, name, item.company)) return false;
+    rows.push({
+      id: uid(), kind, name, company: item.company,
+      detail: kind === "person" ? item.title : item.location,
+      link: kind === "person" ? safeUrl(item.profile_url) : safeUrl(item.url),
+      date: today(), status: kind === "person" ? "drafted" : "applied",
+    });
+    return true;
+  }
+  function markDone(btn, label) { btn.textContent = label; btn.disabled = true; }
+
+  function postingCard(p) {
+    const c = el("article", "res-card");
+    const top = el("div", "res-top");
+    const who = el("div");
+    who.append(el("div", "pv-name", p.title), el("div", "pv-sub", [p.company, p.location].filter(Boolean).join(" · ")));
+    top.append(who);
+    if (p.status) top.append(el("span", "chip", p.status));
+    c.append(top);
+    if (p.why) c.append(el("p", "why", p.why));
+    const acts = el("div", "actions");
+    const url = safeUrl(p.url);
+    if (url) { const a = el("a", "btn primary small", "Open posting"); a.href = url; a.target = "_blank"; a.rel = "noopener"; acts.append(a); }
+    const b = el("button", "btn small", "I applied");
+    b.type = "button";
+    if (inTracker("application", p.title, p.company)) markDone(b, "In tracker");
+    b.addEventListener("click", () => { track("application", p); save(); renderTracker(); markDone(b, "In tracker"); toast("Added to your tracker"); });
+    acts.append(b);
+    c.append(acts);
+    return c;
+  }
+
+  function personCard(p) {
+    const c = el("article", "res-card");
+    const top = el("div", "res-top");
+    const initials = p.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+    top.append(el("span", "avatar", initials));
+    const who = el("div");
+    who.append(el("div", "pv-name", p.name), el("div", "pv-sub", [p.title, p.company].filter(Boolean).join(" · ")));
+    top.append(who);
+    c.append(top);
+    if (p.connection) c.append(el("span", "chip", p.connection));
+    const note = el("textarea", "note");
+    note.value = p.note;
+    note.rows = 3;
+    note.setAttribute("aria-label", `Message to ${p.name}`);
+    const count = el("div", "note-meta");
+    const upd = () => {
+      const n = note.value.length; count.textContent = `${n} / 200`; count.classList.toggle("over", n > 200); p.note = note.value;
+      if (note.offsetParent) { note.style.height = "auto"; note.style.height = `${note.scrollHeight + 2}px`; }
+    };
+    note.addEventListener("input", () => { upd(); store.set(KEYS.last, result); });
+    upd();
+    c.append(note, count);
+    const acts = el("div", "actions");
+    const copy = el("button", "btn primary small", "Copy note");
+    copy.type = "button";
+    const add = el("button", "btn small", "Add to tracker");
+    add.type = "button";
+    if (inTracker("person", p.name, p.company)) markDone(add, "In tracker");
+    copy.addEventListener("click", () => {
+      copyText(note.value, "Note copied. Paste it into LinkedIn.");
+      if (track("person", p)) { save(); renderTracker(); markDone(add, "In tracker"); }
+    });
+    add.addEventListener("click", () => { track("person", p); save(); renderTracker(); markDone(add, "In tracker"); toast("Added to your tracker"); });
+    const prof = el("a", "btn small", safeUrl(p.profile_url) ? "Open profile" : "Find on LinkedIn");
+    prof.href = safeUrl(p.profile_url) || linkedinSearch(p);
+    prof.target = "_blank"; prof.rel = "noopener";
+    acts.append(copy, prof, add);
+    c.append(acts);
+    return c;
+  }
+
+  function renderResults() {
+    const r = result;
+    $("t-results").hidden = !r;
+    if (!r) return;
+    $("t-summary").textContent = r.summary || "";
+    const post = r.postings || [], ppl = r.people || [];
+    $("t-c-post").textContent = post.length ? `· ${post.length}` : "";
+    $("t-c-ppl").textContent = ppl.length ? `· ${ppl.length}` : "";
+    $("t-postings").replaceChildren(...(post.length ? post.map(postingCard) : [el("p", "empty", "No open postings confirmed this time. Try a wider area or a different role.")]));
+    $("t-people").replaceChildren(...(ppl.length ? ppl.map(personCard) : [el("p", "empty", "No confirmed alumni found this time. Try adding companies you like, or run the skill in Claude with Clay for a deeper search.")]));
+    requestAnimationFrame(() => document.querySelectorAll("#t-people .note").forEach((n) => n.dispatchEvent(new Event("input"))));
+  }
+
+  function setBusy(busy) {
+    $("t-go").disabled = busy;
+    $("t-go").textContent = busy ? "Searching…" : "Find my people";
+    $("t-progress").hidden = !busy;
+  }
+
+  function logLine(text) {
+    $("t-stage").textContent = text;
+    const li = el("li", null, text);
+    $("t-log").append(li);
+  }
+
+  async function runSearch(fields) {
+    $("t-error").hidden = true;
+    $("t-log").replaceChildren();
+    result = null; renderResults();
+    setBusy(true);
+    let gotResult = false;
+    try {
+      const res = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields) });
+      if (!res.ok || !res.body) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || "Something went wrong. Try again.");
+      }
+      const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+      let buf = "";
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += value;
+        let i;
+        while ((i = buf.indexOf("\n")) >= 0) {
+          const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+          if (!line) continue;
+          const ev = JSON.parse(line);
+          if (ev.type === "status") logLine(ev.text);
+          else if (ev.type === "error") throw new Error(ev.error);
+          else if (ev.type === "result") { result = ev.data; gotResult = true; }
+        }
+      }
+      if (!gotResult) throw new Error("The search stopped early. Try again.");
+      store.set(KEYS.last, result);
+      renderResults();
+      $("t-results").scrollIntoView({ behavior: "smooth", block: "start" });
+    } catch (err) {
+      const msg = err instanceof TypeError ? "Couldn't reach the search service. Check your connection and try again." : err.message;
+      $("t-error").textContent = msg;
+      $("t-error").hidden = false;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  $("try-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fields = {};
+    TRY_FIELDS.forEach((k) => { fields[k] = $(`t-${k}`).value.trim(); });
+    store.set(KEYS.form, fields);
+    runSearch(fields);
+  });
+
+  $("t-addall").addEventListener("click", () => {
+    if (!result) return;
+    let n = 0;
+    (result.people || []).forEach((p) => { if (track("person", p)) n++; });
+    save(); renderTracker(); renderResults();
+    toast(n ? `Added ${n} ${n === 1 ? "person" : "people"} to your tracker` : "Everyone is already in your tracker");
+  });
+
+  $("t-again").addEventListener("click", () => {
+    result = null; store.set(KEYS.last, null); renderResults();
+    $("t-school").focus();
+  });
+
+  result = store.get(KEYS.last, null);
+
   // ---------- Start ----------
   renderRunSteps();
   renderTracker();
+  renderResults();
   route();
 })();

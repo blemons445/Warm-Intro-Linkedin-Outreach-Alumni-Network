@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/style.css?v=2.1">
+  <link rel="stylesheet" href="assets/style.css?v=3.0">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -22,8 +22,8 @@
       </a>
       <nav aria-label="Main">
         <a href="#home" data-route="home">Home</a>
-        <a href="#setup" data-route="setup">Setup</a>
-        <a href="#run" data-route="run">Run it</a>
+        <a href="#try" data-route="try">Try it</a>
+        <a href="#run" data-route="run">Use in Claude</a>
         <a href="#tracker" data-route="tracker">Tracker</a>
         <a href="#about" data-route="about">How it was built</a>
         <a href="#connect" data-route="connect">Connect!</a>
@@ -40,12 +40,12 @@
     <section class="view home" data-view="home" aria-labelledby="home-title">
       <div class="hero-grid">
         <div class="hero">
-          <p class="badge">Free for students · Runs in Claude</p>
+          <p class="badge">Free for students · Powered by Claude</p>
           <h1 id="home-title">Land the internship through <span class="hl">people</span>, not portals.</h1>
           <p class="lede">Warm Intro finds open internships, finds alumni from your school at those companies, and writes short LinkedIn messages you send yourself. Then it tracks every reply.</p>
           <div class="actions">
-            <a class="btn primary lg" href="#setup">Try it free</a>
-            <a class="btn lg" href="#run">See how it works</a>
+            <a class="btn primary lg" href="#try">Try it free</a>
+            <a class="btn lg" href="#about">See how it works</a>
           </div>
           <p class="trust"><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> No account needed</span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> You send every message</span></p>
         </div>
@@ -128,16 +128,68 @@
 
       <section class="faq" aria-labelledby="faq-h">
         <h2 id="faq-h">Questions</h2>
-        <details><summary>Is it free?</summary><p>Yes. It runs in Claude, which has a free plan, and Clay's free plan covers a few batches of alumni searches.</p></details>
+        <details><summary>Is it free?</summary><p>Yes. Try it on this site with no account, or run the skill in your own Claude account, which has a free plan.</p></details>
         <details><summary>Does it send messages for me?</summary><p>No. It drafts them and you review and send each one yourself on LinkedIn.</p></details>
-        <details><summary>Do I need Clay?</summary><p>No. Clay makes finding alumni faster. Without it, the tool uses web search instead.</p></details>
-        <details><summary>Where is my tracker data stored?</summary><p>Only in your own browser. Nothing is sent to this site. Use Back up on the Tracker page to keep a copy.</p></details>
+        <details><summary>Do I need an account?</summary><p>No. Fill in three fields on Try it and the site does the searching. Running the skill in Claude with Clay connected finds more alumni if you want to go deeper.</p></details>
+        <details><summary>Where is my data stored?</summary><p>Your tracker lives only in your own browser. When you use Try it, your answers are sent to Claude to run the search and aren't saved by this site. Use Back up on the Tracker page to keep a copy.</p></details>
         <details><summary>Does it work for any school?</summary><p>Yes. It was built at Texas A&amp;M, but you tell it your school and it searches for your alumni.</p></details>
       </section>
 
       <div class="band">
-        <div><h2>Your next internship starts with one message.</h2><p>Setup takes about ten minutes.</p></div>
-        <a class="btn onband lg" href="#setup">Try it free</a>
+        <div><h2>Your next internship starts with one message.</h2><p>Three fields, a couple of minutes, no account.</p></div>
+        <a class="btn onband lg" href="#try">Try it free</a>
+      </div>
+    </section>
+
+    <!-- TRY -->
+    <section class="view" data-view="try" aria-labelledby="try-title" hidden>
+      <h1 id="try-title">Try it</h1>
+      <p class="lede">Tell us three things. Warm Intro searches for open internships, finds alumni at those companies and writes your first messages. It takes a couple of minutes.</p>
+
+      <form class="card try-form" id="try-form">
+        <div class="try-grid">
+          <label>Your school<input id="t-school" name="school" required maxlength="80" placeholder="Texas A&amp;M University" autocomplete="organization"></label>
+          <label>What kind of internship<input id="t-kind" name="kind" required maxlength="80" placeholder="Sales or marketing"></label>
+          <label>Where<input id="t-city" name="city" required maxlength="60" placeholder="Dallas-Fort Worth"></label>
+        </div>
+        <details class="more">
+          <summary>Add more detail (optional)</summary>
+          <div class="try-grid">
+            <label>Your first name<input id="t-name" name="name" maxlength="60" placeholder="Bruce"></label>
+            <label>Major<input id="t-major" name="major" maxlength="60" placeholder="Marketing"></label>
+            <label>Year<input id="t-year" name="year" maxlength="20" placeholder="Junior"></label>
+            <label>Term<input id="t-term" name="term" maxlength="30" placeholder="Summer 2027"></label>
+            <label class="wide">Companies you like<input id="t-companies" name="companies" maxlength="200" placeholder="Keurig Dr Pepper, PepsiCo, 7-Eleven"></label>
+          </div>
+        </details>
+        <div class="actions">
+          <button class="btn primary lg" id="t-go" type="submit">Find my people</button>
+          <span class="src">Free. No account. You send every message yourself.</span>
+        </div>
+      </form>
+
+      <div class="card progress" id="t-progress" hidden aria-live="polite">
+        <div class="pg-head"><span class="spinner" aria-hidden="true"></span><strong id="t-stage">Starting</strong></div>
+        <ol class="pg-log" id="t-log"></ol>
+      </div>
+
+      <div class="card t-error" id="t-error" role="alert" hidden></div>
+
+      <div id="t-results" hidden>
+        <div class="res-head">
+          <p class="summary" id="t-summary"></p>
+          <div class="actions">
+            <button class="btn primary" id="t-addall" type="button">Add all to tracker</button>
+            <button class="btn" id="t-again" type="button">New search</button>
+          </div>
+        </div>
+        <h2>1. Apply first <span class="count" id="t-c-post"></span></h2>
+        <p class="src">Programs review applications as they come in, so apply before you message anyone.</p>
+        <div class="res-list" id="t-postings"></div>
+        <h2>2. Then message these people <span class="count" id="t-c-ppl"></span></h2>
+        <p class="src">Copy the note, open their profile, click Connect, then Add a note. Check each person's profile before you send.</p>
+        <div class="res-list" id="t-people"></div>
+        <p class="src">Results come from public web search and can be wrong. Prefer to run it yourself in Claude? <a href="#run">Use the skill</a>.</p>
       </div>
     </section>
 
@@ -169,8 +221,8 @@
 
     <!-- RUN -->
     <section class="view" data-view="run" aria-labelledby="run-title" hidden>
-      <h1 id="run-title">Run it</h1>
-      <p class="lede">Copy the skill into a new Claude chat, then work through the steps. Claude asks the questions; each card below tells you what to say to move on.</p>
+      <h1 id="run-title">Use in Claude</h1>
+      <p class="lede">Prefer to run it yourself? Do the <a href="#setup">one-time setup</a>, copy the skill into a new Claude chat, then work through the steps. Claude asks the questions; each card below tells you what to say to move on.</p>
 
       <div class="card start">
         <div>
@@ -334,12 +386,12 @@
   <footer class="foot">
     <div class="foot-inner">
       <div><a class="brand" href="#home"><img src="assets/icon.svg" alt="" width="24" height="24"><span>Warm Intro</span></a><p>Built by Bruce Hinson, Texas A&amp;M.</p></div>
-      <nav aria-label="Footer"><a href="#setup">Setup</a><a href="#run">Run it</a><a href="#tracker">Tracker</a><a href="#about">How it was built</a></nav>
+      <nav aria-label="Footer"><a href="#try">Try it</a><a href="#run">Use in Claude</a><a href="#tracker">Tracker</a><a href="#about">How it was built</a></nav>
       <nav aria-label="Connect"><a href="https://www.linkedin.com/in/bruce-hinson-713431307" target="_blank" rel="noopener">LinkedIn</a><a href="https://github.com/blemons445/Warm-Intro-Linkedin-Outreach-Alumni-Network" target="_blank" rel="noopener">GitHub</a><a href="#connect">Connect!</a></nav>
     </div>
   </footer>
 
   <div class="toast" id="toast" role="status" hidden></div>
-  <script src="assets/app.js?v=2.0"></script>
+  <script src="assets/app.js?v=3.0"></script>
 </body>
 </html>
