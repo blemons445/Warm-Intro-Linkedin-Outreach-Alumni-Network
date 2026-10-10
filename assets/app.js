@@ -308,14 +308,32 @@
   // Free type-ahead for Company and Role: a built-in list plus whatever is in your tracker.
   const COMPANIES = ["7-Eleven", "Anheuser-Busch", "Aramark", "Ben E. Keith", "Blue Bell Creameries", "Boston Beer Company", "Brinker International", "Brown-Forman", "Campbell's", "Cargill", "Celsius Holdings", "Chick-fil-A", "Chobani", "Coca-Cola", "Coca-Cola Southwest Beverages", "Colgate-Palmolive", "Conagra Brands", "Constellation Brands", "Costco", "Danone", "Darden", "Del Monte Foods", "Diageo", "Domino's", "Dr Pepper Snapple", "E. & J. Gallo Winery", "Ferrero", "Frito-Lay", "General Mills", "Gatorade", "H-E-B", "Heineken", "Hershey", "Hormel Foods", "Imperial Sugar", "J.M. Smucker", "JBS USA", "Kellanova", "Keurig Dr Pepper", "Kimberly-Clark", "Kraft Heinz", "Kroger", "L'Oréal", "Lamb Weston", "Land O'Lakes", "Mars", "McCormick", "McLane Company", "Molson Coors", "Mondelez International", "Monster Beverage", "Nestlé", "Nestlé Purina", "Ocean Spray", "Olipop", "PepsiCo", "Pilgrim's Pride", "Post Holdings", "Procter & Gamble", "Red Bull", "Reyes Coca-Cola Bottling", "Sanderson Farms", "Southern Glazer's Wine & Spirits", "Starbucks", "Sysco", "Target", "Topo Chico", "Tyson Foods", "Unilever", "US Foods", "Walmart", "Whataburger", "Yum! Brands"];
   const ROLES = ["Brand Marketing Intern", "Business Development Intern", "Category Management Intern", "Consumer Insights Intern", "Customer Marketing Intern", "Digital Marketing Intern", "Field Marketing Intern", "Field Sales Intern", "Marketing Intern", "National Accounts Intern", "Operations Intern", "Product Marketing Intern", "Revenue Management Intern", "Sales Analyst Intern", "Sales Intern", "Shopper Marketing Intern", "Social Media Intern", "Supply Chain Intern", "Trade Marketing Intern"];
+  // The big pool (about 9,000 companies and 900 internship titles, from public internship listings and stock exchange lists)
+  // loads in the background; until then the short list above works.
+  const pool = { companies: [], roles: [] };
+  let suggestSig = "";
   function suggestList(id, base, key) {
     let dl = document.getElementById(id);
     if (!dl) { dl = el("datalist"); dl.id = id; document.body.append(dl); }
     const mine = rows.filter((r) => r.kind === "application").map((r) => r[key]).filter(Boolean);
-    const all = [...new Set([...mine, ...base])].sort((a, b) => a.localeCompare(b));
-    dl.replaceChildren(...all.map((v) => { const o = el("option"); o.value = v; return o; }));
+    const seen = new Set();
+    const all = [...mine, ...base].filter((v) => { const k = v.toLowerCase(); if (seen.has(k)) return false; seen.add(k); return true; });
+    const frag = document.createDocumentFragment();
+    all.forEach((v) => { const o = document.createElement("option"); o.value = v; frag.append(o); });
+    dl.replaceChildren(frag);
   }
-  function refreshSuggestions() { suggestList("dl-company", COMPANIES, "company"); suggestList("dl-role", ROLES, "name"); }
+  function refreshSuggestions() {
+    const sig = `${pool.companies.length}|${rows.filter((r) => r.kind === "application").map((r) => r.company + r.name).join()}`;
+    if (sig === suggestSig) return;
+    suggestSig = sig;
+    suggestList("dl-company", [...COMPANIES, ...pool.companies], "company");
+    suggestList("dl-role", [...ROLES, ...pool.roles], "name");
+  }
+  fetch("assets/suggest.json?v=1").then((r) => (r.ok ? r.json() : null)).then((d) => {
+    if (!d) return;
+    pool.companies = d.companies || []; pool.roles = d.roles || [];
+    refreshSuggestions();
+  }).catch(() => {});
 
   function appRow(a = {}) {
     const row = el("div", "app-row");

@@ -2,6 +2,12 @@
 
 How Past the Post got to where it is. Each change came from using it on a real internship search.
 
+## 2.3.0 (Oct 10, 2026): Hiring managers and faster forms
+- Searches now look for the likely hiring manager for each role and flag them; if none is found, a LinkedIn search link fills the gap.
+- Company and Role suggest as you type, from about 9,000 companies and 900 internship titles (public internship listings from SimplifyJobs, plus Nasdaq, NYSE and S&P 500 lists), plus your tracker.
+- School, company and role are required, with the missing ones highlighted. Each visit starts with empty jobs.
+- Claude opens a blank chat to paste into, which avoids its warning on link-filled prompts. Shorter prompts, higher contrast, and the access code box is hidden.
+
 ## 2.2.0 (Oct 10, 2026): Free for everyone, in Claude or ChatGPT
 - Try it now runs free: it opens the visitor's own Claude or ChatGPT with a filled-in prompt, and they paste the results back to get cards, links, notes and tracker entries.
 - Chat prep opens in the same assistant. The full skill page works with ChatGPT too.
