@@ -2,6 +2,12 @@
 
 How Warm Intro got to where it is. Each change came from using it on a real internship search.
 
+## 2.0.0 (Oct 10, 2026): Start from applications, not job searches
+- Refocused on what job boards don't do: you enter jobs you've already applied to, and Warm Intro finds the people at each company.
+- Results are grouped by application, with the posting link and a LinkedIn profile link for every person. People without a confirmed profile link are dropped.
+- New flow: reach out, track replies, coffee chat, then a referral ask for that exact role, written into the chat prep sheet.
+- Applications can be filled straight from the tracker.
+
 ## 1.2.0 (Oct 10, 2026): The full flow on one page
 - Results now walk through four steps: apply, message, track and prep for the chat.
 - "They replied: prep me" on any person builds a coffee chat sheet: their background, company news, a 20-second intro, questions to ask and a thank-you note.

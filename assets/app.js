@@ -53,7 +53,7 @@
     document.title = (name === "home" ? "Warm Intro: AI internship outreach for students" : `${view.textContent} · Warm Intro`);
     if (route.ready) { window.scrollTo(0, 0); $("main").focus({ preventScroll: true }); }
     route.ready = true;
-    if (name === "try") document.querySelectorAll("#t-people .note").forEach((n) => n.dispatchEvent(new Event("input")));
+    if (name === "try") document.querySelectorAll("#t-groups .note").forEach((n) => n.dispatchEvent(new Event("input")));
   }
   window.addEventListener("hashchange", route);
 
@@ -193,6 +193,7 @@
   function renderTotals() {
     const c = counts();
     if (result) trackStep();
+    if (typeof syncAppTools === "function" && $("t-apps").children.length) syncAppTools();
     $("n-sent").textContent = c.sent; $("n-replied").textContent = c.replied; $("n-chat").textContent = c.chat;
     $("n-apps").textContent = c.apps; $("n-int").textContent = c.ints;
     $("post-line").textContent = postLine(c);
@@ -288,14 +289,70 @@
     rows = []; save(); renderTracker(); toast("Cleared");
   });
 
-  // ---------- Try it: the site runs the search ----------
+  // ---------- Try it: from applications you've sent to people at those companies ----------
   // On GitHub Pages the API lives on Vercel; on Vercel or locally it's same-origin.
   const API = location.hostname.endsWith("github.io") ? "https://warm-intro-linkedin-outreach-alumni.vercel.app/api/run" : "/api/run";
-  const TRY_FIELDS = ["school", "kind", "city", "name", "major", "year", "term", "companies"];
+  const TRY_FIELDS = ["school", "name", "major", "year"];
+  const MAX_APPS = 3;
   let result = null;
+
+  function el(tag, cls, text) {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  const safeUrl = (u) => (/^https:\/\//i.test(u || "") ? u : "");
+
+  // Application rows: company, role, optional posting link.
+  function appRow(a = {}) {
+    const row = el("div", "app-row");
+    const field = (label, key, ph, type = "text") => {
+      const l = el("label", null, label);
+      const i = el("input");
+      i.type = type; i.dataset.key = key; i.placeholder = ph; i.value = a[key] || ""; i.maxLength = key === "url" ? 300 : 100;
+      l.append(i);
+      return l;
+    };
+    const rm = el("button", "del", "×");
+    rm.type = "button";
+    rm.setAttribute("aria-label", "Remove this application");
+    rm.addEventListener("click", () => { row.remove(); syncAppTools(); });
+    row.append(field("Company", "company", "Keurig Dr Pepper"), field("Role", "role", "Sales Analyst Intern"), field("Posting link (optional)", "url", "https://…", "url"), rm);
+    return row;
+  }
+  function readApps() {
+    return [...$("t-apps").querySelectorAll(".app-row")].map((r) => {
+      const a = {};
+      r.querySelectorAll("input").forEach((i) => { a[i.dataset.key] = i.value.trim(); });
+      return a;
+    }).filter((a) => a.company);
+  }
+  function setApps(list) {
+    $("t-apps").replaceChildren(...(list.length ? list : [{}]).slice(0, MAX_APPS).map(appRow));
+    syncAppTools();
+  }
+  function syncAppTools() {
+    const n = $("t-apps").querySelectorAll(".app-row").length;
+    $("t-add-app").hidden = n >= MAX_APPS;
+    $("t-apps").querySelectorAll(".del").forEach((b) => { b.hidden = n < 2; });
+    $("t-from-tracker").hidden = !rows.some((r) => r.kind === "application");
+  }
+  $("t-add-app").addEventListener("click", () => {
+    $("t-apps").append(appRow());
+    syncAppTools();
+    $("t-apps").lastElementChild.querySelector("input").focus();
+  });
+  $("t-from-tracker").addEventListener("click", () => {
+    const apps = rows.filter((r) => r.kind === "application").sort((a, b) => (b.date || "").localeCompare(a.date || ""))
+      .map((r) => ({ company: r.company, role: r.name, url: r.link || "" }));
+    setApps(apps);
+    toast(`Filled ${Math.min(apps.length, MAX_APPS)} from your tracker`);
+  });
 
   const savedForm = store.get(KEYS.form, {});
   TRY_FIELDS.forEach((k) => { if (savedForm[k]) $(`t-${k}`).value = savedForm[k]; });
+  setApps(Array.isArray(savedForm.apps) ? savedForm.apps : []);
 
   // Access code: a shared link like ?code=XYZ#try fills it in, so whoever gets the link never types it.
   const urlCode = new URLSearchParams(location.search).get("code");
@@ -306,62 +363,34 @@
   $("t-code").value = store.get(KEYS.code, "") || "";
   const showCode = () => { $("t-code-row").hidden = false; };
 
-  function el(tag, cls, text) {
-    const e = document.createElement(tag);
-    if (cls) e.className = cls;
-    if (text != null) e.textContent = text;
-    return e;
-  }
-  const safeUrl = (u) => (/^https:\/\//i.test(u || "") ? u : "");
-  const linkedinSearch = (p) => `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(`${p.name} ${p.company}`)}`;
-
   function inTracker(kind, name, company) {
     return rows.some((r) => r.kind === kind && r.name.toLowerCase() === name.toLowerCase() && r.company.toLowerCase() === company.toLowerCase());
   }
-  function track(kind, item) {
-    const name = kind === "person" ? item.name : item.title;
-    if (inTracker(kind, name, item.company)) return false;
-    rows.push({
-      id: uid(), kind, name, company: item.company,
-      detail: kind === "person" ? item.title : item.location,
-      link: kind === "person" ? safeUrl(item.profile_url) : safeUrl(item.url),
-      date: today(), status: kind === "person" ? "drafted" : "applied",
-    });
+  function trackPerson(p, app) {
+    if (inTracker("person", p.name, app.company)) return false;
+    rows.push({ id: uid(), kind: "person", name: p.name, company: app.company, detail: p.title, link: result.sample ? "" : safeUrl(p.profile_url), date: today(), status: "drafted" });
+    return true;
+  }
+  function trackApp(app) {
+    if (!app.role || inTracker("application", app.role, app.company)) return false;
+    rows.push({ id: uid(), kind: "application", name: app.role, company: app.company, detail: "", link: result.sample ? "" : safeUrl(app.posting_url), date: today(), status: "applied" });
     return true;
   }
   function markDone(btn, label) { btn.textContent = label; btn.disabled = true; }
 
-  function postingCard(p) {
-    const c = el("article", "res-card");
-    const top = el("div", "res-top");
-    const who = el("div");
-    who.append(el("div", "pv-name", p.title), el("div", "pv-sub", [p.company, p.location].filter(Boolean).join(" · ")));
-    top.append(who);
-    if (p.status) top.append(el("span", "chip", p.status));
-    c.append(top);
-    if (p.why) c.append(el("p", "why", p.why));
-    const acts = el("div", "actions");
-    const url = result.sample ? "" : safeUrl(p.url);
-    if (url) { const a = el("a", "btn primary small", "Open posting"); a.href = url; a.target = "_blank"; a.rel = "noopener"; acts.append(a); }
-    const b = el("button", "btn small", "I applied");
-    b.type = "button";
-    if (inTracker("application", p.title, p.company)) markDone(b, "In tracker");
-    b.addEventListener("click", () => { track("application", p); save(); renderTracker(); markDone(b, "In tracker"); toast("Added to your tracker"); });
-    acts.append(b);
-    c.append(acts);
-    return c;
-  }
-
-  function personCard(p) {
+  function personCard(p, app) {
     const c = el("article", "res-card");
     const top = el("div", "res-top");
     const initials = p.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
     top.append(el("span", "avatar", initials));
     const who = el("div");
-    who.append(el("div", "pv-name", p.name), el("div", "pv-sub", [p.title, p.company].filter(Boolean).join(" · ")));
+    who.append(el("div", "pv-name", p.name), el("div", "pv-sub", p.title));
     top.append(who);
     c.append(top);
-    if (p.connection) c.append(el("span", "chip", p.connection));
+    const tags = el("div", "tags");
+    if (p.connection) tags.append(el("span", "chip", p.connection));
+    c.append(tags);
+    if (p.why) c.append(el("p", "why", p.why));
     const note = el("textarea", "note");
     note.value = p.note;
     note.rows = 3;
@@ -374,27 +403,52 @@
     note.addEventListener("input", () => { upd(); if (!result.sample) store.set(KEYS.last, result); });
     upd();
     c.append(note, count);
+
     const acts = el("div", "actions");
     const copy = el("button", "btn primary small", "Copy note");
     copy.type = "button";
+    const prof = el("a", "btn small", "LinkedIn profile");
+    const url = safeUrl(p.profile_url);
+    if (result.sample || !url) {
+      prof.href = "#try";
+      prof.addEventListener("click", (e) => { e.preventDefault(); toast("Sample person. In a live run this opens their LinkedIn profile."); });
+    } else { prof.href = url; prof.target = "_blank"; prof.rel = "noopener"; }
     const add = el("button", "btn small", "Add to tracker");
     add.type = "button";
-    if (inTracker("person", p.name, p.company)) markDone(add, "In tracker");
+    if (inTracker("person", p.name, app.company)) markDone(add, "In tracker");
     copy.addEventListener("click", () => {
       copyText(note.value, "Note copied. Paste it into LinkedIn.");
-      if (track("person", p)) { save(); renderTracker(); markDone(add, "In tracker"); }
+      if (trackPerson(p, app)) { trackApp(app); save(); renderTracker(); markDone(add, "In tracker"); }
     });
-    add.addEventListener("click", () => { track("person", p); save(); renderTracker(); markDone(add, "In tracker"); toast("Added to your tracker"); });
-    const prof = el("a", "btn small", safeUrl(p.profile_url) ? "Open profile" : "Find on LinkedIn");
-    prof.href = safeUrl(p.profile_url) || linkedinSearch(p);
-    prof.target = "_blank"; prof.rel = "noopener";
-    if (result.sample) acts.append(copy, add); else acts.append(copy, prof, add);
+    add.addEventListener("click", () => { trackPerson(p, app); trackApp(app); save(); renderTracker(); markDone(add, "In tracker"); toast("Added to your tracker"); });
     const prep = el("button", "btn small ghost", "They replied: prep me");
     prep.type = "button";
-    prep.addEventListener("click", () => openPrep(p, prep));
-    acts.append(prep);
+    prep.addEventListener("click", () => openPrep(p, app, prep));
+    acts.append(copy, prof, add, prep);
     c.append(acts);
     return c;
+  }
+
+  function appGroup(app) {
+    const g = el("section", "app-group");
+    const head = el("div", "app-head");
+    const t = el("div");
+    t.append(el("div", "pv-name", app.company), el("div", "pv-sub", app.role ? `You applied: ${app.role}` : "You applied"));
+    head.append(t);
+    const url = result.sample ? "" : safeUrl(app.posting_url);
+    if (url) { const a = el("a", "btn small", "View posting"); a.href = url; a.target = "_blank"; a.rel = "noopener"; head.append(a); }
+    else if (result.sample) {
+      const a = el("a", "btn small", "View posting"); a.href = "#try";
+      a.addEventListener("click", (e) => { e.preventDefault(); toast("Sample posting. In a live run this opens the job post."); });
+      head.append(a);
+    }
+    g.append(head);
+    const list = el("div", "res-list");
+    const ppl = app.people || [];
+    if (ppl.length) ppl.forEach((p) => list.append(personCard(p, app)));
+    else list.append(el("p", "empty", "No one confirmed at this company yet. Try again later, or run the skill in Claude with Clay for a deeper search."));
+    g.append(list);
+    return g;
   }
 
   function renderResults() {
@@ -403,14 +457,10 @@
     if (!r) return;
     $("t-sample").hidden = !r.sample;
     $("t-prep").hidden = true; $("t-prep").replaceChildren();
-    trackStep();
     $("t-summary").textContent = r.summary || "";
-    const post = r.postings || [], ppl = r.people || [];
-    $("t-c-post").textContent = post.length ? `· ${post.length}` : "";
-    $("t-c-ppl").textContent = ppl.length ? `· ${ppl.length}` : "";
-    $("t-postings").replaceChildren(...(post.length ? post.map(postingCard) : [el("p", "empty", "No open postings confirmed this time. Try a wider area or a different role.")]));
-    $("t-people").replaceChildren(...(ppl.length ? ppl.map(personCard) : [el("p", "empty", "No confirmed alumni found this time. Try adding companies you like, or run the skill in Claude with Clay for a deeper search.")]));
-    requestAnimationFrame(() => document.querySelectorAll("#t-people .note").forEach((n) => n.dispatchEvent(new Event("input"))));
+    $("t-groups").replaceChildren(...(r.applications || []).map(appGroup));
+    trackStep();
+    requestAnimationFrame(() => document.querySelectorAll("#t-groups .note").forEach((n) => n.dispatchEvent(new Event("input"))));
   }
 
   function setBusy(busy) {
@@ -418,11 +468,9 @@
     $("t-go").textContent = busy ? "Searching…" : "Find my people";
     $("t-progress").hidden = !busy;
   }
-
   function logLine(text) {
     $("t-stage").textContent = text;
-    const li = el("li", null, text);
-    $("t-log").append(li);
+    $("t-log").append(el("li", null, text));
   }
 
   // Calls the backend and reads its newline-delimited JSON stream.
@@ -430,7 +478,7 @@
     const res = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields) });
     if (!res.ok || !res.body) {
       const data = await res.json().catch(() => ({}));
-      if (data.code_required) { showCode(); }
+      if (data.code_required) showCode();
       throw new Error(data.error || "Something went wrong. Try again.");
     }
     const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
@@ -453,9 +501,10 @@
     return out;
   }
   const errText = (err) => (err instanceof TypeError ? "Couldn't reach the search service. Check your connection and try again." : err.message);
+  function showError(msg) { $("t-error-msg").textContent = msg; $("t-error").hidden = false; }
 
   function currentFields() {
-    const fields = {};
+    const fields = { apps: readApps() };
     TRY_FIELDS.forEach((k) => { fields[k] = $(`t-${k}`).value.trim(); });
     return fields;
   }
@@ -466,89 +515,116 @@
     result = null; renderResults();
     setBusy(true);
     try {
-      result = await callApi(fields, logLine);
+      result = await callApi({ ...fields, code: $("t-code").value.trim() }, logLine);
       result.fields = fields;
       store.set(KEYS.last, result);
       renderResults();
       $("t-results").scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
-      if ($("t-code-row").hidden === false) $("t-code").focus();
-      $("t-error-msg").textContent = errText(err);
-      $("t-error").hidden = false;
+      if (!$("t-code-row").hidden) $("t-code").focus();
+      showError(errText(err));
     } finally {
       setBusy(false);
     }
   }
 
-  // ---------- Coffee chat prep ----------
-  function samplePrep(p) {
+  $("try-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const fields = currentFields();
+    store.set(KEYS.form, fields);
+    const code = $("t-code").value.trim();
+    if (code) store.set(KEYS.code, code);
+    if (!fields.school) { showError("Add your school so we can find your alumni."); $("t-school").focus(); return; }
+    if (!fields.apps.length) { showError("Add at least one company you applied to."); $("t-apps").querySelector("input").focus(); return; }
+    runSearch(fields);
+  });
+
+  $("t-addall").addEventListener("click", () => {
+    if (!result) return;
+    let n = 0;
+    (result.applications || []).forEach((app) => { trackApp(app); (app.people || []).forEach((p) => { if (trackPerson(p, app)) n++; }); });
+    save(); renderTracker(); renderResults();
+    toast(n ? `Added ${n} ${n === 1 ? "person" : "people"} to your tracker` : "Everyone is already in your tracker");
+  });
+
+  $("t-again").addEventListener("click", () => {
+    result = null; store.set(KEYS.last, null); renderResults();
+    $("t-school").focus();
+  });
+
+  // ---------- Coffee chat prep and referral ask ----------
+  function samplePrep(p, app) {
     const first = p.name.split(" ")[0];
     return {
-      about: `${first} is a ${p.title} at ${p.company} and a ${p.connection.replace(/ · .*/, "")} graduate. (Sample: a live run pulls this from their public profile.)`,
-      company_now: `${p.company} is expanding its Dallas-Fort Worth retail team this year. (Sample: a live run uses recent news.)`,
-      intro: `Hi ${first}, thanks for making time. I'm a junior at Texas A&M studying marketing. I've been working toward a sales or brand role in food and beverage, and I just applied to the summer internship here. I'd love to hear how you got started and what the team is like.`,
+      about: `${first} is a ${p.title} at ${app.company} and a ${p.connection.replace(/ · .*/, "")} graduate. (Sample: a live run pulls this from their public profile.)`,
+      company_now: `${app.company} is growing its Dallas-Fort Worth team this year. (Sample: a live run uses recent news.)`,
+      intro: `Hi ${first}, thanks for making time. I'm a junior at Texas A&M studying marketing, and I applied for the ${app.role} role. I'd love to hear how you got started at ${app.company} and what the team is like.`,
       questions: [
-        `What does a typical week look like in your role?`,
-        `What surprised you most when you started at ${p.company}?`,
-        `What do strong interns do in their first month?`,
-        `Which skills should I build this year to be ready?`,
-        `Is there anyone else you'd suggest I talk to?`,
+        "What does a typical week look like in your role?",
+        `What surprised you most when you started at ${app.company}?`,
+        "What do the strongest interns do differently?",
+        "What would you focus on if you were in my position this year?",
+        "Is there anyone else you'd suggest I talk to?",
       ],
-      thank_you: `Thanks again for the chat today, ${first}. Your advice about [something they said] was really helpful, and I'm going to act on it this week. I hope we can stay in touch.`,
+      thank_you: `Thanks again for the chat today, ${first}. Your advice about [something they said] was really helpful, and I'm going to act on it this week.`,
+      referral_ask: `Hi ${first}, thanks again for your time. I'm really excited about the ${app.role} role after talking with you. Would you be comfortable referring me or passing my name to the recruiter? Totally fine if not.`,
     };
   }
 
-  function prepSheet(p, sheet) {
+  function prepSheet(p, app, sheet) {
     const box = el("article", "card prep-sheet");
     const head = el("div", "res-top");
     const t = el("div");
-    t.append(el("div", "pv-name", `Coffee chat prep: ${p.name}`), el("div", "pv-sub", `${p.title} · ${p.company}`));
+    t.append(el("div", "pv-name", `Coffee chat prep: ${p.name}`), el("div", "pv-sub", `${p.title} · ${app.company}`));
     head.append(t);
     const close = el("button", "btn small", "Close");
     close.type = "button";
-    close.addEventListener("click", () => box.remove());
+    close.addEventListener("click", () => { box.remove(); $("t-prep").hidden = true; });
     head.append(close);
     box.append(head);
-    const sec = (label, node) => { const d = el("div", "prep-sec"); d.append(el("span", "label", label), node); box.append(d); };
+    const sec = (label, node, copyable) => {
+      const d = el("div", "prep-sec");
+      d.append(el("span", "label", label), node);
+      if (copyable) {
+        const b = el("button", "btn small", "Copy");
+        b.type = "button";
+        b.addEventListener("click", () => copyText(copyable));
+        d.append(b);
+      }
+      box.append(d);
+    };
     sec("Who they are", el("p", null, sheet.about));
     sec("What's new at the company", el("p", null, sheet.company_now));
-    const intro = el("p", "say-it", sheet.intro);
-    sec("Your 20-second intro", intro);
+    sec("Your 20-second intro", el("p", "say-it", sheet.intro));
     const ol = el("ol");
     (sheet.questions || []).forEach((q) => ol.append(el("li", null, q)));
     sec("Questions to ask", ol);
-    sec("Thank-you note to send after", el("p", "say-it", sheet.thank_you));
-    const acts = el("div", "actions");
-    const cp = el("button", "btn small", "Copy thank-you note");
-    cp.type = "button";
-    cp.addEventListener("click", () => copyText(sheet.thank_you));
-    acts.append(cp);
-    box.append(acts);
+    sec("Thank-you note, send right after", el("p", "say-it", sheet.thank_you), sheet.thank_you);
+    sec("Referral ask, only if it went well", el("p", "say-it", sheet.referral_ask), sheet.referral_ask);
     return box;
   }
 
-  async function openPrep(p, btn) {
+  async function openPrep(p, app, btn) {
     const slot = $("t-prep");
     slot.hidden = false;
     if (result.sample) {
-      slot.replaceChildren(prepSheet(p, samplePrep(p)));
+      slot.replaceChildren(prepSheet(p, app, samplePrep(p, app)));
       slot.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
-    const wait = el("div", "card progress");
+    const waitBox = el("div", "card progress");
     const h = el("div", "pg-head");
     const label = el("strong", null, `Preparing your chat with ${p.name}`);
     h.append(el("span", "spinner"), label);
-    wait.append(h);
-    slot.replaceChildren(wait);
+    waitBox.append(h);
+    slot.replaceChildren(waitBox);
     slot.scrollIntoView({ behavior: "smooth", block: "start" });
     btn.disabled = true;
     try {
-      const f = { ...(result.fields || currentFields()), code: $("t-code").value.trim(), mode: "prep",
-        p_name: p.name, p_title: p.title, p_company: p.company, p_connection: p.connection,
-        p_role: ((result.postings || []).find((x) => x.company === p.company) || {}).title || "" };
-      const sheet = await callApi(f, (t) => { label.textContent = t; });
-      slot.replaceChildren(prepSheet(p, sheet));
+      const f = { ...(result.fields || currentFields()), apps: [], code: $("t-code").value.trim(), mode: "prep",
+        p_name: p.name, p_title: p.title, p_company: app.company, p_connection: p.connection, p_role: app.role };
+      const sheet = await callApi(f, (txt) => { label.textContent = txt; });
+      slot.replaceChildren(prepSheet(p, app, sheet));
     } catch (err) {
       const e = el("div", "card t-error");
       e.append(el("p", null, errText(err)));
@@ -561,53 +637,33 @@
   function trackStep() {
     const c = counts();
     $("t-track-line").textContent = c.people
-      ? `${c.people} ${c.people === 1 ? "person" : "people"} and ${c.apps} ${c.apps === 1 ? "application" : "applications"} in your tracker. Mark each one Sent once you send it, then Replied when they answer.`
+      ? `${c.people} ${c.people === 1 ? "person" : "people"} in your tracker. Mark each one Sent once you send it, then Replied when they answer.`
       : "Copy a note above and that person lands in your tracker. Mark them Sent once you send it, then Replied when they answer.";
   }
 
-  $("try-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-    const fields = currentFields();
-    store.set(KEYS.form, fields);
-    fields.code = $("t-code").value.trim();
-    if (fields.code) store.set(KEYS.code, fields.code);
-    runSearch(fields);
-  });
-
-  $("t-addall").addEventListener("click", () => {
-    if (!result) return;
-    let n = 0;
-    (result.people || []).forEach((p) => { if (track("person", p)) n++; });
-    save(); renderTracker(); renderResults();
-    toast(n ? `Added ${n} ${n === 1 ? "person" : "people"} to your tracker` : "Everyone is already in your tracker");
-  });
-
-  $("t-again").addEventListener("click", () => {
-    result = null; store.set(KEYS.last, null); renderResults();
-    $("t-school").focus();
-  });
-
-  // Sample run: replays a fictional search so anyone (recruiters included) can see the output instantly.
+  // ---------- Sample run: a fictional search anyone can watch, instantly and for free ----------
   const SAMPLE = {
     sample: true,
-    summary: "Found 2 open internships in Dallas-Fort Worth and 3 alumni at those companies. Apply to the Acme Foods role first; its deadline is closest.",
-    postings: [
-      { company: "Acme Foods", title: "Summer 2027 Sales Intern", location: "Dallas, TX", url: "", status: "Open · closes Nov 15", why: "Field sales with a category marketing project, open to marketing juniors." },
-      { company: "Lone Star Beverage", title: "Brand Marketing Intern", location: "Plano, TX", url: "", status: "Open", why: "Brand team for a regional drinks portfolio; asks for retail or social media experience." },
-    ],
-    people: [
-      { name: "Jordan Lee", title: "Sales Coordinator", company: "Acme Foods", profile_url: "", connection: "Texas A&M, Class of 2023 · former intern", note: "Hi Jordan, fellow Aggie here (junior, marketing). I just applied for Acme's Summer Sales internship. What do you wish you'd known before your internship there?" },
-      { name: "Priya Shah", title: "Campus Recruiter", company: "Acme Foods", profile_url: "", connection: "Texas A&M, Class of 2021", note: "Hi Priya, fellow Aggie and marketing junior. I applied for the Summer 2027 Sales internship today. Is there anything you look for that applicants often miss?" },
-      { name: "Marcus Hill", title: "Associate Brand Manager", company: "Lone Star Beverage", profile_url: "", connection: "Texas A&M, Class of 2022", note: "Hi Marcus, Gig 'em! I'm a marketing junior applying to Lone Star's Brand Marketing internship. What does a typical week look like on the brand team?" },
+    summary: "Found 4 people across your 2 applications, 3 of them Texas A&M alumni. Message Jordan first: same school, same team, and a former intern in the program you applied to.",
+    applications: [
+      { company: "Acme Foods", role: "Summer 2027 Sales Intern", posting_url: "", people: [
+        { name: "Jordan Lee", title: "Sales Coordinator", profile_url: "", connection: "Texas A&M, Class of 2023", why: "On the sales team this internship joins, and a former intern in the same program.", note: "Hi Jordan, fellow Aggie here (junior, marketing). I just applied for Acme's Summer Sales internship. What do you wish you'd known before your internship there?" },
+        { name: "Priya Shah", title: "Campus Recruiter", profile_url: "", connection: "Texas A&M, Class of 2021", why: "Recruits for Acme's summer internship program.", note: "Hi Priya, fellow Aggie and marketing junior. I applied for the Summer 2027 Sales internship today. Is there anything you look for that applicants often miss?" },
+      ] },
+      { company: "Lone Star Beverage", role: "Brand Marketing Intern", posting_url: "", people: [
+        { name: "Marcus Hill", title: "Associate Brand Manager", profile_url: "", connection: "Texas A&M, Class of 2022", why: "On the brand team the internship supports.", note: "Hi Marcus, Gig 'em! I'm a marketing junior who applied to Lone Star's Brand Marketing internship. What does a typical week look like on the brand team?" },
+        { name: "Elena Ruiz", title: "Talent Acquisition Partner", profile_url: "", connection: "Recruiter for this role", why: "Listed as the recruiter on the posting.", note: "Hi Elena, I'm a Texas A&M marketing junior and just applied for the Brand Marketing internship. What's the best way to stand out in this year's process?" },
+      ] },
     ],
   };
   const SAMPLE_STEPS = [
-    "Reading your target",
-    "Searching: sales marketing internship Dallas summer 2027",
-    "Searching: Acme Foods careers internship",
-    "Searching: Lone Star Beverage brand marketing intern",
-    "Searching: Texas A&M Acme Foods LinkedIn",
-    "Searching: Texas A&M Lone Star Beverage brand manager",
+    "Reading your 2 applications",
+    "Searching: Acme Foods Summer 2027 Sales Intern posting",
+    "Searching: site:linkedin.com/in Texas A&M Acme Foods sales",
+    "Searching: Acme Foods campus recruiter",
+    "Searching: Lone Star Beverage Brand Marketing Intern posting",
+    "Searching: site:linkedin.com/in Texas A&M Lone Star Beverage brand",
+    "Checking each person's school and current company",
     "Drafting notes",
   ];
   const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -620,7 +676,7 @@
     setBusy(true);
     $("t-progress").scrollIntoView({ behavior: "smooth", block: "center" });
     const fast = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    for (const step of SAMPLE_STEPS) { logLine(step); await wait(fast ? 60 : 450); }
+    for (const step of SAMPLE_STEPS) { logLine(step); await wait(fast ? 60 : 420); }
     setBusy(false);
     result = structuredClone(SAMPLE);
     renderResults();
@@ -628,7 +684,9 @@
   }
   document.querySelectorAll("[data-demo]").forEach((b) => b.addEventListener("click", (e) => { e.preventDefault(); runSample(); }));
 
+  // Results from before this redesign have a different shape; drop them.
   result = store.get(KEYS.last, null);
+  if (result && !Array.isArray(result.applications)) result = null;
 
   // ---------- Start ----------
   renderRunSteps();

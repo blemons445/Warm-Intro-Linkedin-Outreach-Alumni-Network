@@ -1,6 +1,6 @@
 # Warm Intro
 
-**AI internship outreach for students.** Warm Intro finds open internships, finds alumni from your school at those companies, drafts short LinkedIn messages you send yourself, and tracks every reply in one place.
+**Turn applications into conversations.** You tell Warm Intro where you've applied. It finds alumni and recruiters at each company, links their LinkedIn profiles, drafts a short first message, and helps you turn replies into coffee chats and referrals. It isn't a job board: Simplify and others already find jobs. Warm Intro starts after you apply.
 
 **Live app:** https://warm-intro-linkedin-outreach-alumni.vercel.app/
 
@@ -26,7 +26,7 @@ You send every message and every application yourself. The tool never sends, app
 
 ## How to use it
 
-**Fastest:** open the [live app](https://warm-intro-linkedin-outreach-alumni.vercel.app/#try), enter your school, the kind of internship and a city, and press **Find my people**. The site searches, then shows open postings, alumni and a drafted note for each. Copy a note and it's added to your **Tracker**.
+**Fastest:** open the [live app](https://warm-intro-linkedin-outreach-alumni.vercel.app/#try), add your school and the jobs you applied to (or fill them from your tracker), and press **Find my people**. For each application you get the posting link plus alumni and recruiters with LinkedIn links and a drafted note. When someone replies, "prep me" builds a coffee chat sheet that ends with a referral ask. **Watch a sample run** shows the whole flow without a search.
 
 **Deeper search in Claude:** on **Use in Claude**, do the one-time setup (a free Claude account, optionally a free [Clay](https://app.clay.com/signup) account), copy the skill into a new chat and say "Help me find an internship."
 

@@ -1,5 +1,5 @@
-// POST /api/run: searches for open internships and alumni, drafts LinkedIn notes,
-// and streams progress back as newline-delimited JSON.
+// POST /api/run: for jobs a student already applied to, finds alumni and recruiters at each company,
+// drafts LinkedIn notes, and preps coffee chats. Streams progress back as newline-delimited JSON.
 import Anthropic from "@anthropic-ai/sdk";
 
 const client = new Anthropic(); // reads ANTHROPIC_API_KEY
@@ -10,9 +10,10 @@ const ALLOWED_ORIGINS = [
 ];
 
 const FIELDS = {
-  school: 80, major: 60, year: 20, city: 60, kind: 80, term: 30, companies: 200, name: 60, code: 60,
+  school: 80, major: 60, year: 20, name: 60, code: 60,
   mode: 10, p_name: 80, p_title: 120, p_company: 80, p_connection: 120, p_role: 120,
 };
+const MAX_APPS = 3;
 
 // Light per-instance throttle so one visitor can't run up the bill. Chat prep is much cheaper than a search.
 const recent = { search: new Map(), prep: new Map() };
@@ -21,43 +22,40 @@ const WINDOW_MS = 60 * 60 * 1000;
 
 const SUBMIT_TOOL = {
   name: "submit_results",
-  description: "Return the final verified internships, people and drafted LinkedIn notes. Call once, at the end.",
+  description: "Return the people found for each application, with drafted LinkedIn notes. Call once, at the end.",
   strict: true,
   input_schema: {
     type: "object",
     additionalProperties: false,
-    required: ["summary", "postings", "people"],
+    required: ["summary", "applications"],
     properties: {
-      summary: { type: "string", description: "One or two sentences on what was found." },
-      postings: {
+      summary: { type: "string", description: "One or two sentences on who was found and who to message first." },
+      applications: {
         type: "array",
         items: {
           type: "object",
           additionalProperties: false,
-          required: ["company", "title", "location", "url", "status", "why"],
+          required: ["company", "role", "posting_url", "people"],
           properties: {
             company: { type: "string" },
-            title: { type: "string" },
-            location: { type: "string" },
-            url: { type: "string", description: "Link to the posting, ideally on the company's own careers site." },
-            status: { type: "string", description: "Open, deadline, or anything notable about timing." },
-            why: { type: "string", description: "One line on why it fits the student." },
-          },
-        },
-      },
-      people: {
-        type: "array",
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["name", "title", "company", "profile_url", "connection", "note"],
-          properties: {
-            name: { type: "string" },
-            title: { type: "string" },
-            company: { type: "string" },
-            profile_url: { type: "string", description: "LinkedIn or other public profile URL seen in search results, or empty." },
-            connection: { type: "string", description: "What links them to the student, e.g. 'Texas A&M, Class of 2022', as shown in the source." },
-            note: { type: "string", description: "LinkedIn connection note, under 200 characters." },
+            role: { type: "string" },
+            posting_url: { type: "string", description: "The posting the student gave, or the one you found on the company's site, or empty." },
+            people: {
+              type: "array",
+              items: {
+                type: "object",
+                additionalProperties: false,
+                required: ["name", "title", "profile_url", "connection", "why", "note"],
+                properties: {
+                  name: { type: "string" },
+                  title: { type: "string" },
+                  profile_url: { type: "string", description: "Their LinkedIn profile URL (linkedin.com/in/...) exactly as seen in a source." },
+                  connection: { type: "string", description: "What links them to the student, e.g. 'Texas A&M, Class of 2022', as shown in the source." },
+                  why: { type: "string", description: "One line: why this person, e.g. 'on the sales team this internship joins' or 'recruits for this program'." },
+                  note: { type: "string", description: "LinkedIn connection note, under 200 characters." },
+                },
+              },
+            },
           },
         },
       },
@@ -72,49 +70,51 @@ const PREP_TOOL = {
   input_schema: {
     type: "object",
     additionalProperties: false,
-    required: ["about", "company_now", "intro", "questions", "thank_you"],
+    required: ["about", "company_now", "intro", "questions", "thank_you", "referral_ask"],
     properties: {
       about: { type: "string", description: "Two or three sentences on the person's role and path, only from what you found or were given." },
       company_now: { type: "string", description: "One or two recent, relevant facts about the company or team, with no speculation." },
       intro: { type: "string", description: "The student's 20-second spoken intro, first person." },
       questions: { type: "array", items: { type: "string" }, description: "Four or five specific questions to ask." },
       thank_you: { type: "string", description: "A short thank-you message to send after the chat." },
+      referral_ask: { type: "string", description: "A short, low-pressure message asking whether they'd be comfortable referring the student or passing their name to the recruiter, to send only if the chat went well." },
     },
   },
 };
 
-function prepPrompt(f) {
-  return `A college student has a 15-minute coffee chat coming up. Write a short prep sheet.
+function student(f) {
+  return `${f.name || "The student"}, ${[f.year, f.major].filter(Boolean).join(" ") || "a student"} at ${f.school}`;
+}
 
-Student: ${f.name || "(name not given)"}, ${f.year || ""} ${f.major || ""} at ${f.school}, looking for ${f.kind} in ${f.city}${f.term ? `, ${f.term}` : ""}.
+function prepPrompt(f) {
+  return `A college student has a 15-minute coffee chat coming up with someone at a company they applied to. Write a short prep sheet.
+
+Student: ${student(f)}.
 Person: ${f.p_name}, ${f.p_title} at ${f.p_company}. Connection: ${f.p_connection || "same school"}.
-Role the student is applying for: ${f.p_role || "an internship at the company"}.
+Role the student applied for: ${f.p_role || "an internship at the company"}.
 
 Use web search briefly for the person's public background and recent company news. Don't invent details; if you can't find something, keep that part general.
-The intro should be natural and under 60 words. Questions should be about their work and advice, not asking for a referral. The thank-you note should be 2 or 3 sentences and mention one thing to fill in from the chat as [something they said].
+The intro should be natural and under 60 words and mention the application. Questions should be about their work, the team and advice. The thank-you note should be 2 or 3 sentences and include [something they said] for the student to fill in. The referral ask should be 2 or 3 sentences, easy to say no to, and mention the exact role.
 
 When done, call submit_prep once. Don't write the sheet as text.`;
 }
 
 function systemPrompt(f) {
-  return `You help a college student land an internship through people, not portals.
+  const list = f.apps.map((a, i) => `${i + 1}. ${a.company}: ${a.role}${a.url ? ` (posting: ${a.url})` : ""}`).join("\n");
+  return `You help a college student turn applications they've already sent into conversations with people at those companies, so they can get coffee chats and, eventually, referrals. You are not a job search tool; don't suggest other jobs.
 
-Student:
-- Name: ${f.name || "(not given)"}
-- School: ${f.school}
-- Major: ${f.major || "(not given)"}
-- Year: ${f.year || "(not given)"}
-- Wants: ${f.kind}
-- Where: ${f.city}
-- Term: ${f.term || "next summer"}
-- Companies they're interested in: ${f.companies || "(open to suggestions)"}
+Student: ${student(f)}.
 
-Do this with web search:
-1. Find 3 to 5 internship postings that are open now and match. Prefer each company's own careers site; job boards often keep closed or last year's listings up, so skip anything you can't confirm is current.
-2. At those companies, find 3 to 6 people who went to ${f.school}: recent graduates and campus recruiters first. Search public profiles (for example LinkedIn results). Only include someone if a source you saw shows both the company and ${f.school}. Similar school names (branch campuses, other universities with the same city name) don't count. Never invent a person, title or URL; leave profile_url empty if you didn't see one.
-3. For each person, write a LinkedIn connection note under 200 characters. Mention the shared school, say what the student is applying for, and end with one easy question they can answer in a line. No referral asks, no requests for a call, no flattery.
+Applications already sent:
+${list}
 
-Fewer real results beat more guessed ones. If you find nothing reliable for a step, return an empty list for it and say so in the summary.
+For each application, use web search to:
+1. Confirm the posting link. Use the link given; otherwise find the posting on the company's own careers site. Leave it empty if you can't find it.
+2. Find 2 or 3 people at that company worth messaging, in this order: graduates of ${f.school} on the team or in the department the role sits in; ${f.school} graduates elsewhere at the company, recent graduates first; former interns of the same program; the recruiter or campus recruiter for the program. Search public LinkedIn profiles (for example "site:linkedin.com/in ${f.school} <company>").
+   Only include someone if a source you saw shows their current company, and for alumni, ${f.school}. Similar school names (branch campuses, other schools with the same city in the name) don't count. Every person must have a linkedin.com/in/ profile URL that you saw; skip anyone without one. Never invent a person, title or URL.
+3. Write a LinkedIn connection note for each person, under 200 characters: mention the shared school if there is one, say the student applied for the exact role, and end with one easy question about their work they can answer in a line. No referral ask and no request for a call in the first message.
+
+Fewer real people beat more guessed ones. If you find no one for an application, return an empty people list for it and say so in the summary.
 
 When done, call submit_results once. Don't write the results as text.`;
 }
@@ -124,7 +124,23 @@ function clean(body) {
   for (const [k, max] of Object.entries(FIELDS)) {
     f[k] = String(body?.[k] ?? "").replace(/\s+/g, " ").trim().slice(0, max);
   }
+  const tidy = (v, max) => String(v ?? "").replace(/\s+/g, " ").trim().slice(0, max);
+  f.apps = (Array.isArray(body?.apps) ? body.apps : [])
+    .map((a) => ({ company: tidy(a?.company, 80), role: tidy(a?.role, 100), url: tidy(a?.url, 300) }))
+    .map((a) => ({ ...a, url: /^https?:\/\//i.test(a.url) ? a.url : "" }))
+    .filter((a) => a.company)
+    .slice(0, MAX_APPS);
   return f;
+}
+
+// Keep only people with a real LinkedIn profile link, so every card links somewhere.
+function tidyResult(r) {
+  const isProfile = (u) => /^https:\/\/([a-z]{2,3}\.)?(www\.)?linkedin\.com\/in\/[^/?#\s]+/i.test(u || "");
+  for (const a of r.applications || []) {
+    a.posting_url = /^https?:\/\//i.test(a.posting_url || "") ? a.posting_url : "";
+    a.people = (a.people || []).filter((p) => p.name && isProfile(p.profile_url));
+  }
+  return r;
 }
 
 function cors(origin) {
@@ -146,8 +162,9 @@ export async function POST(request) {
 
   let f;
   try { f = clean(await request.json()); } catch { return json(400, { error: "Bad request." }); }
-  if (!f.school || !f.kind || !f.city) return json(400, { error: "School, internship type and city are required." });
   const mode = f.mode === "prep" ? "prep" : "search";
+  if (!f.school) return json(400, { error: "Add your school." });
+  if (mode === "search" && !f.apps.length) return json(400, { error: "Add at least one company you applied to." });
   if (mode === "prep" && (!f.p_name || !f.p_company)) return json(400, { error: "Missing who the chat is with." });
 
   // Optional: set ACCESS_CODE in Vercel to limit live searches to people you've given the code.
@@ -167,10 +184,10 @@ export async function POST(request) {
     async start(controller) {
       const send = (obj) => controller.enqueue(encoder.encode(JSON.stringify(obj) + "\n"));
       try {
-        send({ type: "status", text: mode === "prep" ? `Looking up ${f.p_name}` : "Reading your target" });
+        send({ type: "status", text: mode === "prep" ? `Looking up ${f.p_name}` : `Reading your ${f.apps.length === 1 ? "application" : "applications"}` });
         const result = mode === "prep"
           ? await run({ system: prepPrompt(f), ask: "Write my coffee chat prep sheet.", tool: PREP_TOOL, searches: 3 }, send)
-          : await run({ system: systemPrompt(f), ask: "Find my internships, people and draft notes.", tool: SUBMIT_TOOL, searches: 10 }, send);
+          : tidyResult(await run({ system: systemPrompt(f), ask: "Find the people for my applications and draft notes.", tool: SUBMIT_TOOL, searches: 4 + 3 * f.apps.length }, send));
         send({ type: "result", data: result });
       } catch (err) {
         send({ type: "error", error: friendly(err) });
@@ -210,7 +227,7 @@ async function run({ system, ask, tool, searches }, send) {
 
     const msg = await stream.finalMessage();
 
-    if (msg.stop_reason === "refusal") throw new UserError("The search was declined. Try rewording your target.");
+    if (msg.stop_reason === "refusal") throw new UserError("The search was declined. Try rewording the company or role.");
 
     const submit = msg.content.find((b) => b.type === "tool_use" && b.name === tool.name);
     if (submit) return submit.input;
@@ -219,13 +236,13 @@ async function run({ system, ask, tool, searches }, send) {
       messages.push({ role: "assistant", content: msg.content });
       continue;
     }
-    if (msg.stop_reason === "max_tokens") throw new UserError("The search ran too long. Try a narrower target.");
+    if (msg.stop_reason === "max_tokens") throw new UserError("The search ran too long. Try fewer applications at once.");
 
     // Ended with text instead of the tool: ask once more for the structured result.
     messages.push({ role: "assistant", content: msg.content });
     messages.push({ role: "user", content: `Now call ${tool.name} with what you found.` });
   }
-  throw new UserError("The search didn't finish. Try again with a narrower target.");
+  throw new UserError("The search didn't finish. Try again with fewer applications.");
 }
 
 class UserError extends Error {}
