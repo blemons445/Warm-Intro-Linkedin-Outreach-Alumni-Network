@@ -4,7 +4,6 @@ How Past the Post got to where it is. Each change came from using it on a real i
 
 ## 2.1.0 (Oct 10, 2026): Renamed to Past the Post
 - New name for the new focus: getting past the job posting to the people behind it. (Previously Warm Intro.)
-- Added a scroll animation on the home page that walks through the five steps, from applying to the referral.
 
 ## 2.0.0 (Oct 10, 2026): Start from applications, not job searches
 - Refocused on what job boards don't do: you enter jobs you've already applied to, and Past the Post finds the people at each company.

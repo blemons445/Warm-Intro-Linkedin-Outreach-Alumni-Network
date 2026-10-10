@@ -687,47 +687,6 @@
   result = store.get(KEYS.last, null);
   if (result && !Array.isArray(result.applications)) result = null;
 
-  // ---------- Home: scroll story ----------
-  // Each step's text drives the sticky graphic beside it; works without JS as plain steps.
-  (function story() {
-    const stage = $("story-stage");
-    if (!stage) return;
-    const steps = [...document.querySelectorAll(".story-steps li")];
-    const NOTE = "Hi Jordan, fellow Aggie here! I just applied for Acme's Summer Sales internship. What do you wish you'd known before joining the team?";
-    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let typed = false, timer = null;
-    function type() {
-      if (typed) return;
-      typed = true;
-      const out = $("st-type"), count = $("st-count");
-      if (still) { out.textContent = NOTE; count.textContent = `${NOTE.length} / 200`; return; }
-      let i = 0;
-      timer = setInterval(() => {
-        i = Math.min(NOTE.length, i + 2);
-        out.textContent = NOTE.slice(0, i);
-        count.textContent = `${i} / 200`;
-        if (i >= NOTE.length) clearInterval(timer);
-      }, 22);
-    }
-    function show(n) {
-      stage.dataset.step = n;
-      steps.forEach((li) => li.classList.toggle("active", Number(li.dataset.step) === n));
-      if (n >= 3) type();
-    }
-    // On phones the graphic sits on top, so steps switch lower in the viewport, below it.
-    const phone = matchMedia("(max-width: 760px)").matches;
-    const fitTop = () => stage.style.setProperty("--story-top", `${document.querySelector(".top").offsetHeight + 8}px`);
-    fitTop();
-    addEventListener("resize", fitTop);
-    const io = new IntersectionObserver((entries) => {
-      entries.forEach((e) => { if (e.isIntersecting) show(Number(e.target.dataset.step)); });
-    }, { rootMargin: phone ? "-68% 0px -30% 0px" : "-45% 0px -45% 0px" });
-    steps.forEach((li) => {
-      io.observe(li);
-      li.addEventListener("click", () => show(Number(li.dataset.step)));
-    });
-  })();
-
   // ---------- Start ----------
   renderRunSteps();
   renderTracker();
