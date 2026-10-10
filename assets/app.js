@@ -380,7 +380,8 @@
     history.replaceState(null, "", location.pathname + location.hash);
   }
   $("t-code").value = store.get(KEYS.code, "") || "";
-  if ($("t-code").value) $("t-code-box").open = true;
+  // The box stays hidden unless this visitor has a code (live search is off while no API key is set).
+  if ($("t-code").value) { $("t-code-box").hidden = false; $("t-code-box").open = true; }
 
   function inTracker(kind, name, company) {
     return rows.some((r) => r.kind === kind && r.name.toLowerCase() === name.toLowerCase() && r.company.toLowerCase() === company.toLowerCase());
@@ -551,7 +552,7 @@
   $("try-form").addEventListener("submit", (e) => {
     e.preventDefault();
     // Enter in a field runs the free path unless the visitor is using an access code.
-    if (!$("t-code-box").open) { startFree(lastAi); return; }
+    if ($("t-code-box").hidden || !$("t-code-box").open) { startFree(lastAi); return; }
     const fields = currentFields();
     store.set(KEYS.form, fields);
     const code = $("t-code").value.trim();
