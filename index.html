@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/style.css?v=1.2">
+  <link rel="stylesheet" href="assets/style.css?v=2.0">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -37,52 +37,107 @@
   <main id="main" tabindex="-1">
 
     <!-- HOME -->
-    <section class="view" data-view="home" aria-labelledby="home-title">
+    <section class="view home" data-view="home" aria-labelledby="home-title">
       <div class="hero-grid">
         <div class="hero">
-          <p class="eyebrow">Free for students · Runs in Claude</p>
-          <h1 id="home-title">Meet the people who can get you hired.</h1>
-          <p class="lede">Most internships go to people someone already knows. Warm Intro finds open internships, finds alumni from your school at those companies, writes short LinkedIn messages you send yourself, and tracks every reply in one place.</p>
+          <p class="badge">Free for students · Runs in Claude</p>
+          <h1 id="home-title">Land the internship through <span class="hl">people</span>, not portals.</h1>
+          <p class="lede">Warm Intro finds open internships, finds alumni from your school at those companies, and writes short LinkedIn messages you send yourself. Then it tracks every reply.</p>
           <div class="actions">
-            <a class="btn primary" href="#setup">Get started free</a>
-            <a class="btn" href="#tracker">See the tracker</a>
+            <a class="btn primary lg" href="#setup">Try it free</a>
+            <a class="btn lg" href="#run">See how it works</a>
           </div>
+          <p class="trust"><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> No account needed</span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> You send every message</span></p>
         </div>
         <div class="preview" aria-label="Example of what Warm Intro produces">
-          <div class="pv-card">
-            <div class="pv-row"><span class="avatar" aria-hidden="true">JL</span><div><div class="pv-name">Jordan Lee</div><div class="pv-sub">Sales Coordinator · alum, class of 2023</div></div></div>
+          <div class="rings" aria-hidden="true"></div>
+          <div class="pv-card pv-a">
+            <div class="pv-row"><span class="avatar" aria-hidden="true">JL</span><div><div class="pv-name">Jordan Lee</div><div class="pv-sub">Sales Coordinator · Acme Foods</div></div><span class="chip">Alum '23</span></div>
             <div class="pv-msg">Hi Jordan, fellow alum here (junior, marketing). I just applied for Acme's Summer Sales internship. What do you wish you'd known before joining the sales team?</div>
-            <div class="pv-meta"><span>Connection note</span><span>176 / 200 characters</span></div>
+            <div class="pv-meta"><span>Connection note</span><span>176 / 200</span></div>
           </div>
-          <div class="pv-card">
-            <div class="pv-row" style="justify-content:space-between"><span class="pv-name">This week</span><span class="pill">2 replies</span></div>
-            <div class="pv-stats"><div><b>6</b>messages</div><div><b>2</b>replies</div><div><b>1</b>coffee chat</div></div>
+          <div class="pv-card pv-b">
+            <div class="pv-row" style="justify-content:space-between"><span class="pv-name">Your outreach</span><span class="pill"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> 2 replies</span></div>
+            <div class="pv-stats"><div><b>6</b>sent</div><div><b>2</b>replies</div><div><b>1</b>chat</div></div>
           </div>
-          <p class="src">Example data</p>
+          <p class="src pv-note">Example data</p>
         </div>
       </div>
 
-      <div class="stats" role="list">
-        <div class="stat" role="listitem"><b>6–7%</b><span>of applications come from referrals, but they make up 30–50% of hires</span></div>
-        <div class="stat" role="listitem"><b>88%</b><span>of employers call referrals their best source of quality candidates</span></div>
-        <div class="stat" role="listitem"><b>29 vs 39</b><span>days to hire through a referral vs other channels</span></div>
-      </div>
-      <p class="src">Sources: Zippia, SHRM and Forbes Agency Council, compiled by <a href="https://www.chanty.com/blog/employee-referral-statistics/">Chanty</a>.</p>
+      <section class="statband" aria-labelledby="why-h">
+        <h2 id="why-h">Referrals are the shortcut most students skip</h2>
+        <div class="bigstats">
+          <div><b>30–50%</b><span>of hires come from referrals, which are only 6–7% of applications</span></div>
+          <div><b>88%</b><span>of employers call referrals their best source of quality candidates</span></div>
+          <div><b>10 days</b><span>faster to hire through a referral (29 vs 39)</span></div>
+        </div>
+        <p class="src">Sources: Zippia, SHRM and Forbes Agency Council, compiled by <a href="https://www.chanty.com/blog/employee-referral-statistics/">Chanty</a>.</p>
+      </section>
 
-      <h2>Everything in one place</h2>
-      <ul class="features">
-        <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg></span><strong>Set your target</strong><p>Role, term, cities and companies, asked one question at a time.</p></li>
-        <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></span><strong>Find open internships</strong><p>Every posting checked on the company's own careers site, so you never chase a closed listing.</p></li>
-        <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><path d="M3 20a6 6 0 0 1 12 0"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2A5 5 0 0 1 21 19"/></svg></span><strong>Find alumni and recruiters</strong><p>People you know first, then alumni from your school, each confirmed from their education history.</p></li>
-        <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><strong>Draft first messages</strong><p>Notes that fit LinkedIn's 200-character limit, with one easy question. No referral asks.</p></li>
-        <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span><strong>Tailor your resume</strong><p>Rewritten to match the posting, using only what's true.</p></li>
-        <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span><strong>Track every reply</strong><p>Messages, chats and applications in one tracker, with real numbers for your LinkedIn post.</p></li>
+      <div class="feature">
+        <div class="f-text">
+          <p class="kicker">Step 1 and 2</p>
+          <h2>Only open roles, checked at the source</h2>
+          <p>Tell it your cities, role and term. It checks every posting on the company's own careers site, so you never chase a closed or last-year listing, and flags the best match to apply to first.</p>
+        </div>
+        <div class="f-visual" aria-hidden="true">
+          <div class="pv-card">
+            <div class="list-row"><div><div class="pv-name">Summer Sales Intern</div><div class="pv-sub">Acme Foods · Dallas</div></div><span class="pill"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> Open</span></div>
+            <div class="list-row"><div><div class="pv-name">Brand Marketing Intern</div><div class="pv-sub">Lone Star Beverage · Plano</div></div><span class="pill"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> Open</span></div>
+            <div class="list-row muted-row"><div><div class="pv-name">Field Sales Intern</div><div class="pv-sub">Northfield Snacks · Irving</div></div><span class="chip ghost">Ran last year</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature flip">
+        <div class="f-text">
+          <p class="kicker">Step 3</p>
+          <h2>Alumni first, each one confirmed</h2>
+          <p>It finds people you already know, then alumni from your school on the right team, recent grads first. Every school claim is checked against their education history, because similar names don't count.</p>
+        </div>
+        <div class="f-visual" aria-hidden="true">
+          <div class="pv-card">
+            <div class="pv-row"><span class="avatar">PS</span><div><div class="pv-name">Priya Shah</div><div class="pv-sub">Campus Recruiter · Acme Foods</div></div><span class="chip">Alum '22</span></div>
+            <div class="pv-row"><span class="avatar">MH</span><div><div class="pv-name">Marcus Hill</div><div class="pv-sub">Brand Manager · Lone Star</div></div><span class="chip">Alum '21</span></div>
+            <div class="pv-row"><span class="avatar">BC</span><div><div class="pv-name">Ben Carter</div><div class="pv-sub">Field Sales · Northfield</div></div><span class="chip">Former intern</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature">
+        <div class="f-text">
+          <p class="kicker">Step 4 and beyond</p>
+          <h2>Messages that get replies, tracked in one place</h2>
+          <p>Each note fits LinkedIn's 200-character limit and asks one easy question, never for a referral. Log what you send and watch replies and coffee chats add up.</p>
+          <a class="btn" href="#tracker">Open the tracker</a>
+        </div>
+        <div class="f-visual" aria-hidden="true">
+          <div class="pv-card">
+            <div class="list-row"><div class="pv-name">Jordan Lee</div><span class="pill">Coffee chat</span></div>
+            <div class="list-row"><div class="pv-name">Priya Shah</div><span class="pill">Replied</span></div>
+            <div class="list-row"><div class="pv-name">Marcus Hill</div><span class="chip ghost">Sent</span></div>
+          </div>
+        </div>
+      </div>
+
+      <ul class="minis">
+        <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg></span><strong>Tailored resume</strong><p>Matched to the posting, using only what's true.</p></li>
+        <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4z"/><path d="M6 1v3M10 1v3M14 1v3"/></svg></span><strong>Coffee chat prep</strong><p>Their background, your intro and questions to ask.</p></li>
+        <li><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><strong>You stay in control</strong><p>It never sends, applies or connects for you.</p></li>
       </ul>
-      <p class="rule">You send every message and every application yourself. The AI does the research; the conversations are yours.</p>
+
+      <section class="faq" aria-labelledby="faq-h">
+        <h2 id="faq-h">Questions</h2>
+        <details><summary>Is it free?</summary><p>Yes. It runs in Claude, which has a free plan, and Clay's free plan covers a few batches of alumni searches.</p></details>
+        <details><summary>Does it send messages for me?</summary><p>No. It drafts them and you review and send each one yourself on LinkedIn.</p></details>
+        <details><summary>Do I need Clay?</summary><p>No. Clay makes finding alumni faster. Without it, the tool uses web search instead.</p></details>
+        <details><summary>Where is my tracker data stored?</summary><p>Only in your own browser. Nothing is sent to this site. Use Back up on the Tracker page to keep a copy.</p></details>
+        <details><summary>Does it work for any school?</summary><p>Yes. It was built at Texas A&amp;M, but you tell it your school and it searches for your alumni.</p></details>
+      </section>
 
       <div class="band">
-        <div><h2>Ready to find your first warm intro?</h2><p>Setup takes about ten minutes. No account on this site.</p></div>
-        <a class="btn primary" href="#setup">Get started free</a>
+        <div><h2>Your next internship starts with one message.</h2><p>Setup takes about ten minutes.</p></div>
+        <a class="btn onband lg" href="#setup">Try it free</a>
       </div>
     </section>
 
@@ -277,10 +332,14 @@
   </main>
 
   <footer class="foot">
-    <p>Built by <a href="#connect">Bruce Hinson</a>, Texas A&amp;M. You send every message yourself.</p>
+    <div class="foot-inner">
+      <div><a class="brand" href="#home"><img src="assets/icon.svg" alt="" width="24" height="24"><span>Warm Intro</span></a><p>Built by Bruce Hinson, Texas A&amp;M.</p></div>
+      <nav aria-label="Footer"><a href="#setup">Setup</a><a href="#run">Run it</a><a href="#tracker">Tracker</a><a href="#about">How it was built</a></nav>
+      <nav aria-label="Connect"><a href="https://www.linkedin.com/in/bruce-hinson-713431307" target="_blank" rel="noopener">LinkedIn</a><a href="https://github.com/blemons445/Warm-Intro-Linkedin-Outreach-Alumni-Network" target="_blank" rel="noopener">GitHub</a><a href="#connect">Connect!</a></nav>
+    </div>
   </footer>
 
   <div class="toast" id="toast" role="status" hidden></div>
-  <script src="assets/app.js?v=1.2"></script>
+  <script src="assets/app.js?v=2.0"></script>
 </body>
 </html>
