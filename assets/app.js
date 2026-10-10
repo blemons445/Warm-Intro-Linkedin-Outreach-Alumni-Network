@@ -371,7 +371,8 @@
 
   const savedForm = store.get(KEYS.form, {});
   TRY_FIELDS.forEach((k) => { if (savedForm[k]) $(`t-${k}`).value = savedForm[k]; });
-  setApps(Array.isArray(savedForm.apps) ? savedForm.apps : []);
+  // Only your school and "more about you" carry over. Jobs start empty each visit ("Fill from my tracker" brings them back).
+  setApps([]);
 
   // Access code: a shared link like ?code=XYZ#try fills it in, so whoever gets the link never types it.
   const urlCode = new URLSearchParams(location.search).get("code");
@@ -570,7 +571,7 @@
   });
 
   $("t-again").addEventListener("click", () => {
-    result = null; store.set(KEYS.last, null); renderResults();
+    result = null; store.set(KEYS.last, null); renderResults(); setApps([]);
     $("t-paste").hidden = true; $("t-paste-text").value = "";
     $("t-school").focus();
   });
@@ -758,9 +759,8 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
     $("t-results").scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  // Results from before this redesign have a different shape; drop them.
-  result = store.get(KEYS.last, null);
-  if (result && !Array.isArray(result.applications)) result = null;
+  // Each visit starts clean: past results aren't shown again (people you copied a note for are in the tracker).
+  result = null;
 
   // ---------- Start ----------
   renderRunSteps();
