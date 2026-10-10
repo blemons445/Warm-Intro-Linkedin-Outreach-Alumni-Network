@@ -388,6 +388,7 @@
     top.append(who);
     c.append(top);
     const tags = el("div", "tags");
+    if (p.hiring_manager) tags.append(el("span", "chip hm", "Likely hiring manager"));
     if (p.connection) tags.append(el("span", "chip", p.connection));
     c.append(tags);
     if (p.why) c.append(el("p", "why", p.why));
@@ -442,6 +443,14 @@
     if (ppl.length) ppl.forEach((p) => list.append(personCard(p, app)));
     else list.append(el("p", "empty", "No one confirmed at this company yet. Try again later, or use the full skill with Clay for a deeper search."));
     g.append(list);
+    // No confident hiring manager: hand them a LinkedIn search to look themselves.
+    if (!ppl.some((p) => p.hiring_manager)) {
+      const q = `${app.company} ${app.role ? app.role.replace(/\b(summer|intern(ship)?|20\d\d)\b/gi, "").trim() : ""} manager`.replace(/\s+/g, " ");
+      const a = el("a", "find-hm", "Hiring manager not pinned down. Search LinkedIn for them");
+      a.href = `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(q)}`;
+      a.target = "_blank"; a.rel = "noopener";
+      g.append(a);
+    }
     return g;
   }
 
@@ -620,7 +629,8 @@
 
   // ---------- Free runs: the visitor's own Claude or ChatGPT does the search ----------
   const AI = {
-    claude: { name: "Claude", url: (q) => `https://claude.ai/new?q=${encodeURIComponent(q)}` },
+    // Claude shows a "use caution" banner on link-prefilled prompts, so open a blank chat and let the visitor paste.
+    claude: { name: "Claude", paste: true, url: () => "https://claude.ai/new" },
     chatgpt: { name: "ChatGPT", url: (q) => `https://chatgpt.com/?hints=search&q=${encodeURIComponent(q)}` },
   };
 
@@ -637,42 +647,38 @@
 
   function searchPrompt(f) {
     const apps = f.apps.map((a, i) => `${i + 1}. ${a.company}: ${a.role || "internship"}${a.url ? ` (${a.url})` : ""}`).join("\n");
-    return `I've already applied to these jobs and want to reach real people at each company for coffee chats and, later, referrals. Use web search.
+    return `Use web search. I applied to these jobs and want to meet people at each company.
 
-Jobs I applied to:
 ${apps}
 
 About me:
 ${aboutYou(f)}
 
-For each job:
-1. Find the posting link on the company's careers site (use mine if given).
-2. Find 2 to 4 people there worth messaging. First, people who share something with me (school, hometown, club, past employer), then former interns of the program, people on the team, and the recruiter. Search LinkedIn profiles, e.g. "site:linkedin.com/in <company> <shared thing>". Only include someone if a source shows their current company and any shared ground you claim. Never invent people, titles or links.
-3. Write a LinkedIn connection note for each, under 200 characters: open with what we share, say I applied for that role, end with one easy question about their work. No referral or call ask.
+For each job, find the posting link and 2 to 4 real people there to message, with their LinkedIn profile links. Put people who share something with me first (school, hometown, club, past job), then former interns, the team and the recruiter. Only include people you found a source for.
 
-Finish with ONLY this JSON in one code block, so I can paste it into Past the Post:
-{"summary":"","applications":[{"company":"","role":"","posting_url":"","people":[{"name":"","title":"","profile_url":"https://www.linkedin.com/in/...","connection":"","why":"","note":""}]}]}`;
+Also try hard to find the likely hiring manager, the person the role reports to: check the posting for a named contact or reporting line, search LinkedIn for that manager title on that team in that city, and look for posts from people there saying they're hiring for this role. List them first with "hiring_manager":true (at most one per job) and say in "why" how you know.
+
+For each person, write a LinkedIn note under 200 characters: what we share, that I applied, and one easy question.
+
+End with only this JSON in a code block:
+{"summary":"","applications":[{"company":"","role":"","posting_url":"","people":[{"name":"","title":"","profile_url":"","hiring_manager":false,"connection":"","why":"","note":""}]}]}`;
   }
 
   function prepPrompt(p, app, f) {
-    return `I have a 15-minute coffee chat with ${p.name}, ${p.title} at ${app.company}. I applied for ${app.role || "an internship"} there. What we share: ${p.connection || "nothing known"}.${p.profile_url ? ` Their LinkedIn: ${p.profile_url}` : ""}
+    return `Use web search. I have a coffee chat with ${p.name}, ${p.title} at ${app.company}. I applied for ${app.role || "an internship"} there. What we share: ${p.connection || "nothing known"}.${p.profile_url ? ` Their LinkedIn: ${p.profile_url}` : ""}
 
 About me:
 ${aboutYou(f)}
 
-Use web search briefly, then give me a short prep sheet:
-1. Who they are (2 or 3 sentences, only from sources)
-2. One or two recent facts about the company or team
-3. My 20-second intro, under 60 words, mentioning my application
-4. Five questions to ask about their work and advice
-5. A 2 to 3 sentence thank-you note to send after, with [something they said] to fill in
-6. A short, easy-to-decline referral ask for that exact role, to send only if the chat goes well`;
+Give me a short prep sheet: who they are, one recent company fact, my 20-second intro, five questions to ask, a thank-you note to send after, and a short referral ask to send only if the chat goes well.`;
   }
 
   let lastAi = "claude";
   function openAssistant(which, prompt) {
     lastAi = which;
-    copyText(prompt, `Opening ${AI[which].name}. The prompt is also copied, in case you need to paste it.`);
+    copyText(prompt, AI[which].paste
+      ? `Prompt copied. Paste it into ${AI[which].name} and press Send.`
+      : `Opening ${AI[which].name}. The prompt is also copied, in case you need to paste it.`);
     window.open(AI[which].url(prompt), "_blank", "noopener");
   }
 
@@ -683,6 +689,9 @@ Use web search briefly, then give me a short prep sheet:
     if (!fields.apps.length) { showError("Add at least one company you applied to."); $("t-apps").querySelector("input").focus(); return; }
     openAssistant(which, searchPrompt(fields));
     document.querySelectorAll("[data-ai-name]").forEach((n) => { n.textContent = AI[which].name; });
+    $("t-paste-step").innerHTML = AI[which].paste
+      ? "paste your prompt (it is already copied) with Ctrl+V, or ⌘V on a Mac, and press <strong>Send</strong>."
+      : "press <strong>Send</strong> if your message is waiting there.";
     $("t-paste").hidden = false;
     $("t-paste").dataset.fields = JSON.stringify(fields);
     $("t-paste").scrollIntoView({ behavior: "smooth", block: "center" });
@@ -705,7 +714,7 @@ Use web search briefly, then give me a short prep sheet:
         company: str(ap.company, 80), role: str(ap.role, 120), posting_url: str(ap.posting_url, 400),
         people: (Array.isArray(ap.people) ? ap.people : []).slice(0, 6).filter((p) => p && p.name).map((p) => ({
           name: str(p.name, 80), title: str(p.title, 120), profile_url: str(p.profile_url, 400),
-          connection: str(p.connection, 120), why: str(p.why, 200), note: str(p.note, 400),
+          hiring_manager: p.hiring_manager === true, connection: str(p.connection, 120), why: str(p.why, 200), note: str(p.note, 400),
         })),
       })).filter((ap) => ap.company),
     };

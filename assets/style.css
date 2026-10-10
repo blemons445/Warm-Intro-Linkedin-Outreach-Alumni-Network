@@ -211,6 +211,8 @@ main:focus, main:focus-visible { outline: none; }
 .pv-meta { display: flex; justify-content: space-between; color: var(--muted); font-size: 0.8rem; }
 .pv-note { text-align: right; }
 .chip { font-size: 0.78rem; font-weight: 600; color: var(--chip-fg); background: var(--chip-bg); padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.chip.hm { color: var(--on-cta); background: var(--cta); }
+.find-hm { display: inline-block; margin-top: 10px; font-size: 0.85rem; color: var(--muted); }
 .chip.ghost { color: var(--muted); background: transparent; border: 1px solid var(--line); }
 .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 0.78rem; font-weight: 600; padding: 3px 10px; border-radius: 999px; color: var(--good); background: color-mix(in srgb, var(--good) 12%, transparent); white-space: nowrap; }
 .pv-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
