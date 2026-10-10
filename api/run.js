@@ -46,11 +46,12 @@ const SUBMIT_TOOL = {
               items: {
                 type: "object",
                 additionalProperties: false,
-                required: ["name", "title", "profile_url", "hiring_manager", "connection", "why", "note"],
+                required: ["name", "title", "profile_url", "hiring_manager", "other_team", "connection", "why", "note"],
                 properties: {
                   name: { type: "string" },
                   title: { type: "string" },
                   profile_url: { type: "string", description: "Their LinkedIn profile URL (linkedin.com/in/...) exactly as seen in a source." },
+                  other_team: { type: "boolean", description: "True when they work outside the function this role joins (for example supply chain for a marketing role)." },
                   hiring_manager: { type: "boolean", description: "True only for the person most likely to manage this role. At most one per application." },
                   connection: { type: "string", description: "The shared ground, as shown in the source (e.g. 'Texas A&M, Class of 2022', 'Also from Houston', 'Ex-Target intern'), or their link to the role (e.g. 'Recruiter for this program', 'On the hiring team')." },
                   why: { type: "string", description: "One line: why this person, e.g. 'on the sales team this internship joins' or 'recruits for this program'." },
@@ -117,7 +118,7 @@ ${list}
 
 For each application, use web search to:
 1. Confirm the posting link. Use the link given; otherwise find the posting on the company's own careers site. Leave it empty if you can't find it.
-2. Find 2 to 4 people at that company worth messaging, in the same function as the role (marketing or brand people for a marketing role, sales people for a sales role). Within that function, prefer people who share something real with the student: the same school, hometown, club or organization, or a past employer; then former interns of the same program; then others on the team the role joins. The recruiter for the program also counts. Skip people in unrelated functions (for example supply chain for a marketing role) even when they share a school. Mix these; they don't all need shared ground. Search public LinkedIn profiles (for example "site:linkedin.com/in <company> <shared thing>").
+2. Find 2 to 4 people at that company worth messaging, in the same function as the role (marketing or brand people for a marketing role, sales people for a sales role). Within that function, prefer people who share something real with the student: the same school, hometown, club or organization, or a past employer; then former interns of the same program; then others on the team the role joins. The recruiter for the program also counts. People in other functions (for example supply chain for a marketing role) who share real ground with the student are still worth including after same-team people; set other_team true for them and name their team in why. Mix these; they don't all need shared ground. Search public LinkedIn profiles (for example "site:linkedin.com/in <company> <shared thing>").
    Also look hard for the likely hiring manager: the person this role would report to. Check the posting for a named contact, team or reporting line ("reports to the Brand Manager"); then search LinkedIn for that title on that team at that location (for example "site:linkedin.com/in <company> <team or brand> manager <city>"), and for posts from people at the company saying they're hiring for this role. List them first, set hiring_manager true for at most one person, and say in why how you know (named in the posting, posted about the role, or leads the team in that city). If you can't narrow it to one person, set it false for everyone.
    Only include someone if a source you saw shows their current company, and any shared ground you claim. Similar school names (branch campuses, other schools with the same city in the name) don't count. Every person must have a linkedin.com/in/ profile URL that you saw; skip anyone without one. Never invent a person, title, connection or URL.
 3. Write a LinkedIn connection note for each person, under 200 characters: open with the shared ground if there is one, say the student applied for the exact role, and end with one easy question about their work they can answer in a line. No referral ask and no request for a call in the first message.

@@ -442,6 +442,7 @@
     c.append(top);
     const tags = el("div", "tags");
     if (p.hiring_manager) tags.append(el("span", "chip hm", "Likely hiring manager"));
+    if (p.other_team) { const t = el("span", "chip ghost", "Different team"); t.title = "Shares something with you but works outside this role's team. Good for advice, less so for a referral."; tags.append(t); }
     if (p.connection) tags.append(el("span", "chip", p.connection));
     c.append(tags);
     if (p.why) c.append(el("p", "why", p.why));
@@ -707,14 +708,14 @@ ${apps}
 About me:
 ${aboutYou(f)}
 
-For each job, find the posting link and 2 to 4 real people there to message, with their LinkedIn profile links. Stay in the same function as the role: for a marketing role, people in marketing or brand; for a sales role, people in sales. Among those, put people who share something with me first (school, hometown, club, past job), then former interns of that program, then the recruiter. Skip people in unrelated functions (like supply chain for a marketing role) even if we share a school, unless they recruit for the role. Only include people you found a source for.
+For each job, find the posting link and 2 to 4 real people there to message, with their LinkedIn profile links. Stay in the same function as the role: for a marketing role, people in marketing or brand; for a sales role, people in sales. Among those, put people who share something with me first (school, hometown, club, past job), then former interns of that program, then the recruiter. People on other teams (like supply chain for a marketing role) who share something with me are still worth including, but list them after same-team people, set "other_team":true, and name their team in "why". Only include people you found a source for.
 
 Also try hard to find the likely hiring manager, the person the role reports to: check the posting for a named contact or reporting line, search LinkedIn for that manager title on that team in that city, and look for posts from people there saying they're hiring for this role. List them first with "hiring_manager":true (at most one per job) and say in "why" how you know.
 
 For each person, write a LinkedIn note under 200 characters: what we share, that I applied, and one easy question.
 
 End with only this JSON in a code block:
-{"summary":"","applications":[{"company":"","role":"","posting_url":"","people":[{"name":"","title":"","profile_url":"","hiring_manager":false,"connection":"","why":"","note":""}]}]}`;
+{"summary":"","applications":[{"company":"","role":"","posting_url":"","people":[{"name":"","title":"","profile_url":"","hiring_manager":false,"other_team":false,"connection":"","why":"","note":""}]}]}`;
   }
 
   function prepPrompt(p, app, f) {
@@ -767,7 +768,7 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
         company: str(ap.company, 80), role: str(ap.role, 120), posting_url: str(ap.posting_url, 400),
         people: (Array.isArray(ap.people) ? ap.people : []).slice(0, 6).filter((p) => p && p.name).map((p) => ({
           name: str(p.name, 80), title: str(p.title, 120), profile_url: str(p.profile_url, 400),
-          hiring_manager: p.hiring_manager === true, connection: str(p.connection, 120), why: str(p.why, 320), note: str(p.note, 400),
+          hiring_manager: p.hiring_manager === true, other_team: p.other_team === true, connection: str(p.connection, 120), why: str(p.why, 320), note: str(p.note, 400),
         })),
       })).filter((ap) => ap.company),
     };
