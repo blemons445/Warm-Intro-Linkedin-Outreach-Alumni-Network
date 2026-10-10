@@ -28,11 +28,11 @@ You send every message and every application yourself. The tool never sends, app
 
 ## How to use it
 
-**Fastest:** open the [live app](https://past-the-post.vercel.app/#try), add your school and the jobs you applied to (or fill them from your tracker), and press **Find my people**. For each application you get the posting link plus people with LinkedIn links and a drafted note. When someone replies, "prep me" builds a coffee chat sheet that ends with a referral ask. **Watch a sample run** shows the whole flow without a search.
+**Fastest:** open the [live app](https://past-the-post.vercel.app/#try), add your school and the jobs you applied to (or fill them from your tracker), and press **Run free in Claude** or **Run free in ChatGPT**. A new chat opens with everything filled in; your own free account does the search and ends with a results block. Paste it back and you get, for each application, the posting link plus people with LinkedIn links and a drafted note. When someone replies, "prep me" opens a coffee chat prep in the same assistant, ending with a referral ask.
 
 **Deeper search in Claude:** on **Use in Claude**, do the one-time setup (a free Claude account, optionally a free [Clay](https://app.clay.com/signup) account), copy the skill into a new chat and say "Help me find an internship."
 
-No install and no account on this site. The tracker is stored in your own browser; use **Back up** to save a copy.
+No install and no sign-up on this site. The tracker is stored in your own browser; use **Back up** to save a copy.
 
 ## How it was built
 
@@ -40,7 +40,8 @@ Past the Post is two parts:
 
 - **The skill** ([`skill/SKILL.md`](skill/SKILL.md)): the instructions Claude follows. It uses Clay to find people and web search to check postings.
 - **The web app** (`index.html`, `assets/`): a plain HTML, CSS and JavaScript site with no build step. It runs the one-page search, hands the skill to Claude for deeper runs, and keeps the tracker.
-- **The backend** ([`api/run.js`](api/run.js)): one Vercel serverless function. It calls the Claude API with web search and a strict output schema, streams progress to the page as it searches, and returns postings, people and notes as JSON. The API key stays on the server, each visitor is limited to a few searches an hour, and an optional `ACCESS_CODE` limits live search to people who have the code (a link with `?code=` fills it in).
+- **Free runs**: Try it builds a prompt from the form, opens it in the visitor's own Claude or ChatGPT, and parses the JSON block they paste back into cards and tracker entries. Nobody pays for these searches.
+- **The backend** ([`api/run.js`](api/run.js)), for access-code demos: one Vercel serverless function. It calls the Claude API with web search and a strict output schema, streams progress to the page as it searches, and returns postings, people and notes as JSON. The API key stays on the server, each visitor is limited to a few searches an hour, and an optional `ACCESS_CODE` limits live search to people who have the code (a link with `?code=` fills it in).
 
 ### Decisions that came from testing
 

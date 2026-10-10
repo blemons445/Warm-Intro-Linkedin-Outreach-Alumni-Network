@@ -2,6 +2,11 @@
 
 How Past the Post got to where it is. Each change came from using it on a real internship search.
 
+## 2.2.0 (Oct 10, 2026): Free for everyone, in Claude or ChatGPT
+- Try it now runs free: it opens the visitor's own Claude or ChatGPT with a filled-in prompt, and they paste the results back to get cards, links, notes and tracker entries.
+- Chat prep opens in the same assistant. The full skill page works with ChatGPT too.
+- Removed the sample run. Live search on the site stays available with an access code.
+
 ## 2.1.0 (Oct 10, 2026): Renamed to Past the Post
 - New name for the new focus: getting past the job posting to the people behind it. (Previously Warm Intro.)
 

@@ -68,7 +68,7 @@
   }
 
   const RUN_STEPS = [
-    { key: "target", title: "Set your target", say: "Help me find an internship.", note: "Claude asks about ten short questions: where, what role, which companies, your school and year." },
+    { key: "target", title: "Set your target", say: "Help me find an internship.", note: "It asks about ten short questions: where, what role, which companies, your school and year." },
     { key: "roles", title: "Find open internships", say: "Find open internships for my targets.", note: "You get a list of postings checked on each company's own site, with the best match flagged. Apply to that one soon." },
     { key: "people", title: "Find people to message", say: "Find people at those companies.", note: "Alumni and recruiters at companies with an open posting, recent graduates first, each with a reason to reach out." },
     { key: "drafts", title: "Draft your messages", say: "Draft messages for this batch.", note: "Review each one, send it yourself on LinkedIn, then add it to the Tracker." },
@@ -103,7 +103,7 @@
     .catch(() => { $("skill-text").textContent = "Couldn't load the skill here. Use Download SKILL.md instead."; });
   $("copy-skill").addEventListener("click", () => {
     if (!skillText) { toast("The skill is still loading. Try again in a moment."); return; }
-    copyText(skillText, "Skill copied. Paste it into a new Claude chat.");
+    copyText(skillText, "Skill copied. Paste it into a new Claude or ChatGPT chat.");
   });
 
   // ---------- Tracker ----------
@@ -361,19 +361,19 @@
     history.replaceState(null, "", location.pathname + location.hash);
   }
   $("t-code").value = store.get(KEYS.code, "") || "";
-  const showCode = () => { $("t-code-row").hidden = false; };
+  if ($("t-code").value) $("t-code-box").open = true;
 
   function inTracker(kind, name, company) {
     return rows.some((r) => r.kind === kind && r.name.toLowerCase() === name.toLowerCase() && r.company.toLowerCase() === company.toLowerCase());
   }
   function trackPerson(p, app) {
     if (inTracker("person", p.name, app.company)) return false;
-    rows.push({ id: uid(), kind: "person", name: p.name, company: app.company, detail: p.title, link: result.sample ? "" : safeUrl(p.profile_url), date: today(), status: "drafted" });
+    rows.push({ id: uid(), kind: "person", name: p.name, company: app.company, detail: p.title, link: safeUrl(p.profile_url), date: today(), status: "drafted" });
     return true;
   }
   function trackApp(app) {
     if (!app.role || inTracker("application", app.role, app.company)) return false;
-    rows.push({ id: uid(), kind: "application", name: app.role, company: app.company, detail: "", link: result.sample ? "" : safeUrl(app.posting_url), date: today(), status: "applied" });
+    rows.push({ id: uid(), kind: "application", name: app.role, company: app.company, detail: "", link: safeUrl(app.posting_url), date: today(), status: "applied" });
     return true;
   }
   function markDone(btn, label) { btn.textContent = label; btn.disabled = true; }
@@ -400,19 +400,18 @@
       const n = note.value.length; count.textContent = `${n} / 200`; count.classList.toggle("over", n > 200); p.note = note.value;
       if (note.offsetParent) { note.style.height = "auto"; note.style.height = `${note.scrollHeight + 2}px`; }
     };
-    note.addEventListener("input", () => { upd(); if (result && !result.sample) store.set(KEYS.last, result); });
+    note.addEventListener("input", () => { upd(); if (result) store.set(KEYS.last, result); });
     upd();
     c.append(note, count);
 
     const acts = el("div", "actions");
     const copy = el("button", "btn primary small", "Copy note");
     copy.type = "button";
-    const prof = el("a", "btn small", "LinkedIn profile");
-    const url = safeUrl(p.profile_url);
-    if (result.sample || !url) {
-      prof.href = "#try";
-      prof.addEventListener("click", (e) => { e.preventDefault(); toast("Sample person. In a live run this opens their LinkedIn profile."); });
-    } else { prof.href = url; prof.target = "_blank"; prof.rel = "noopener"; }
+    // Every person gets a link: their profile if found, otherwise a LinkedIn search for them.
+    const url = /linkedin\.com\/in\//i.test(p.profile_url || "") ? safeUrl(p.profile_url) : "";
+    const prof = el("a", "btn small", url ? "LinkedIn profile" : "Find on LinkedIn");
+    prof.href = url || `https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(`${p.name} ${app.company}`)}`;
+    prof.target = "_blank"; prof.rel = "noopener";
     const add = el("button", "btn small", "Add to tracker");
     add.type = "button";
     if (inTracker("person", p.name, app.company)) markDone(add, "In tracker");
@@ -435,18 +434,13 @@
     const t = el("div");
     t.append(el("div", "pv-name", app.company), el("div", "pv-sub", app.role ? `You applied: ${app.role}` : "You applied"));
     head.append(t);
-    const url = result.sample ? "" : safeUrl(app.posting_url);
+    const url = safeUrl(app.posting_url);
     if (url) { const a = el("a", "btn small", "View posting"); a.href = url; a.target = "_blank"; a.rel = "noopener"; head.append(a); }
-    else if (result.sample) {
-      const a = el("a", "btn small", "View posting"); a.href = "#try";
-      a.addEventListener("click", (e) => { e.preventDefault(); toast("Sample posting. In a live run this opens the job post."); });
-      head.append(a);
-    }
     g.append(head);
     const list = el("div", "res-list");
     const ppl = app.people || [];
     if (ppl.length) ppl.forEach((p) => list.append(personCard(p, app)));
-    else list.append(el("p", "empty", "No one confirmed at this company yet. Try again later, or run the skill in Claude with Clay for a deeper search."));
+    else list.append(el("p", "empty", "No one confirmed at this company yet. Try again later, or use the full skill with Clay for a deeper search."));
     g.append(list);
     return g;
   }
@@ -455,7 +449,6 @@
     const r = result;
     $("t-results").hidden = !r;
     if (!r) { $("t-groups").replaceChildren(); return; }
-    $("t-sample").hidden = !r.sample;
     $("t-prep").hidden = true; $("t-prep").replaceChildren();
     $("t-summary").textContent = r.summary || "";
     $("t-groups").replaceChildren(...(r.applications || []).map(appGroup));
@@ -478,7 +471,7 @@
     const res = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields) });
     if (!res.ok || !res.body) {
       const data = await res.json().catch(() => ({}));
-      if (data.code_required) showCode();
+      if (data.code_required) { $("t-code-box").open = true; }
       throw new Error(data.error || "Something went wrong. Try again.");
     }
     const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
@@ -521,7 +514,6 @@
       renderResults();
       $("t-results").scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
-      if (!$("t-code-row").hidden) $("t-code").focus();
       showError(errText(err));
     } finally {
       setBusy(false);
@@ -530,6 +522,8 @@
 
   $("try-form").addEventListener("submit", (e) => {
     e.preventDefault();
+    // Enter in a field runs the free path unless the visitor is using an access code.
+    if (!$("t-code-box").open) { startFree(lastAi); return; }
     const fields = currentFields();
     store.set(KEYS.form, fields);
     const code = $("t-code").value.trim();
@@ -548,28 +542,11 @@
 
   $("t-again").addEventListener("click", () => {
     result = null; store.set(KEYS.last, null); renderResults();
+    $("t-paste").hidden = true; $("t-paste-text").value = "";
     $("t-school").focus();
   });
 
   // ---------- Coffee chat prep and referral ask ----------
-  function samplePrep(p, app) {
-    const first = p.name.split(" ")[0];
-    return {
-      about: `${first} is a ${p.title} at ${app.company}. Shared ground: ${p.connection}. (Sample: a live run pulls this from their public profile.)`,
-      company_now: `${app.company} is growing its Dallas-Fort Worth team this year. (Sample: a live run uses recent news.)`,
-      intro: `Hi ${first}, thanks for making time. I'm a marketing junior at Texas A&M, and I applied for the ${app.role} role. I'd love to hear how you got started at ${app.company} and what the team is like.`,
-      questions: [
-        "What does a typical week look like in your role?",
-        `What surprised you most when you started at ${app.company}?`,
-        "What do the strongest interns do differently?",
-        "What would you focus on if you were in my position this year?",
-        "Is there anyone else you'd suggest I talk to?",
-      ],
-      thank_you: `Thanks again for the chat today, ${first}. Your advice about [something they said] was really helpful, and I'm going to act on it this week.`,
-      referral_ask: `Hi ${first}, thanks again for your time. I'm really excited about the ${app.role} role after talking with you. Would you be comfortable referring me or passing my name to the recruiter? Totally fine if not.`,
-    };
-  }
-
   function prepSheet(p, app, sheet) {
     const box = el("article", "card prep-sheet");
     const head = el("div", "res-top");
@@ -606,9 +583,10 @@
   async function openPrep(p, app, btn) {
     const slot = $("t-prep");
     slot.hidden = false;
-    if (result.sample) {
-      slot.replaceChildren(prepSheet(p, app, samplePrep(p, app)));
-      slot.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Results that came from the visitor's own chat: prep runs there too.
+    if (result.via) {
+      openAssistant(result.via, prepPrompt(p, app, result.fields || currentFields()));
+      slot.hidden = true;
       return;
     }
     const waitBox = el("div", "card progress");
@@ -640,48 +618,116 @@
       : "Copy a note above and that person lands in your tracker. Mark them Sent once you send it, then Replied when they answer.";
   }
 
-  // ---------- Sample run: a fictional search anyone can watch, instantly and for free ----------
-  const SAMPLE = {
-    sample: true,
-    summary: "Found 4 people across your 2 applications: two fellow Aggies, someone from your hometown, and the recruiter. Message Jordan first: same school, same team, and a former intern in the program you applied to.",
-    applications: [
-      { company: "Acme Foods", role: "Summer 2027 Sales Intern", posting_url: "", people: [
-        { name: "Jordan Lee", title: "Sales Coordinator", profile_url: "", connection: "Texas A&M, Class of 2023", why: "On the sales team this internship joins, and a former intern in the same program.", note: "Hi Jordan, fellow Aggie here (junior, marketing). I just applied for Acme's Summer Sales internship. What do you wish you'd known before your internship there?" },
-        { name: "Priya Shah", title: "Campus Recruiter", profile_url: "", connection: "Texas A&M, Class of 2021", why: "Recruits for Acme's summer internship program.", note: "Hi Priya, fellow Aggie and marketing junior. I applied for the Summer 2027 Sales internship today. Is there anything you look for that applicants often miss?" },
-      ] },
-      { company: "Lone Star Beverage", role: "Brand Marketing Intern", posting_url: "", people: [
-        { name: "Marcus Hill", title: "Associate Brand Manager", profile_url: "", connection: "Also from Katy, TX", why: "On the brand team the internship supports.", note: "Hi Marcus, fellow Katy native here! I'm a marketing junior who applied to Lone Star's Brand Marketing internship. What does a typical week look like on the brand team?" },
-        { name: "Elena Ruiz", title: "Talent Acquisition Partner", profile_url: "", connection: "Recruiter for this role", why: "Listed as the recruiter on the posting.", note: "Hi Elena, I'm a Texas A&M marketing junior and just applied for the Brand Marketing internship. What's the best way to stand out in this year's process?" },
-      ] },
-    ],
+  // ---------- Free runs: the visitor's own Claude or ChatGPT does the search ----------
+  const AI = {
+    claude: { name: "Claude", url: (q) => `https://claude.ai/new?q=${encodeURIComponent(q)}` },
+    chatgpt: { name: "ChatGPT", url: (q) => `https://chatgpt.com/?hints=search&q=${encodeURIComponent(q)}` },
   };
-  const SAMPLE_STEPS = [
-    "Reading your 2 applications",
-    "Searching: Acme Foods Summer 2027 Sales Intern posting",
-    "Searching: site:linkedin.com/in Texas A&M Acme Foods sales",
-    "Searching: Acme Foods campus recruiter",
-    "Searching: Lone Star Beverage Brand Marketing Intern posting",
-    "Searching: site:linkedin.com/in Texas A&M Lone Star Beverage brand",
-    "Checking each person's school and current company",
-    "Drafting notes",
-  ];
-  const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
-  async function runSample() {
-    if (location.hash !== "#try") location.hash = "try";
+  function aboutYou(f) {
+    return [
+      f.name && `Name: ${f.name}`,
+      f.school && `School: ${f.school}`,
+      (f.year || f.major) && `Year and major: ${[f.year, f.major].filter(Boolean).join(" ")}`,
+      f.hometown && `Hometown: ${f.hometown}`,
+      f.orgs && `Clubs and organizations: ${f.orgs}`,
+      f.past && `Past jobs: ${f.past}`,
+    ].filter(Boolean).join("\n") || "(nothing else given)";
+  }
+
+  function searchPrompt(f) {
+    const apps = f.apps.map((a, i) => `${i + 1}. ${a.company}: ${a.role || "internship"}${a.url ? ` (${a.url})` : ""}`).join("\n");
+    return `I've already applied to these jobs and want to reach real people at each company for coffee chats and, later, referrals. Use web search.
+
+Jobs I applied to:
+${apps}
+
+About me:
+${aboutYou(f)}
+
+For each job:
+1. Find the posting link on the company's careers site (use mine if given).
+2. Find 2 to 4 people there worth messaging. First, people who share something with me (school, hometown, club, past employer), then former interns of the program, people on the team, and the recruiter. Search LinkedIn profiles, e.g. "site:linkedin.com/in <company> <shared thing>". Only include someone if a source shows their current company and any shared ground you claim. Never invent people, titles or links.
+3. Write a LinkedIn connection note for each, under 200 characters: open with what we share, say I applied for that role, end with one easy question about their work. No referral or call ask.
+
+Finish with ONLY this JSON in one code block, so I can paste it into Past the Post:
+{"summary":"","applications":[{"company":"","role":"","posting_url":"","people":[{"name":"","title":"","profile_url":"https://www.linkedin.com/in/...","connection":"","why":"","note":""}]}]}`;
+  }
+
+  function prepPrompt(p, app, f) {
+    return `I have a 15-minute coffee chat with ${p.name}, ${p.title} at ${app.company}. I applied for ${app.role || "an internship"} there. What we share: ${p.connection || "nothing known"}.${p.profile_url ? ` Their LinkedIn: ${p.profile_url}` : ""}
+
+About me:
+${aboutYou(f)}
+
+Use web search briefly, then give me a short prep sheet:
+1. Who they are (2 or 3 sentences, only from sources)
+2. One or two recent facts about the company or team
+3. My 20-second intro, under 60 words, mentioning my application
+4. Five questions to ask about their work and advice
+5. A 2 to 3 sentence thank-you note to send after, with [something they said] to fill in
+6. A short, easy-to-decline referral ask for that exact role, to send only if the chat goes well`;
+  }
+
+  let lastAi = "claude";
+  function openAssistant(which, prompt) {
+    lastAi = which;
+    copyText(prompt, `Opening ${AI[which].name}. The prompt is also copied, in case you need to paste it.`);
+    window.open(AI[which].url(prompt), "_blank", "noopener");
+  }
+
+  function startFree(which) {
+    const fields = currentFields();
+    store.set(KEYS.form, fields);
     $("t-error").hidden = true;
-    $("t-log").replaceChildren();
-    result = null; renderResults();
-    setBusy(true);
-    $("t-progress").scrollIntoView({ behavior: "smooth", block: "center" });
-    const fast = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    for (const step of SAMPLE_STEPS) { logLine(step); await wait(fast ? 60 : 420); }
-    setBusy(false);
-    result = structuredClone(SAMPLE);
+    if (!fields.apps.length) { showError("Add at least one company you applied to."); $("t-apps").querySelector("input").focus(); return; }
+    openAssistant(which, searchPrompt(fields));
+    document.querySelectorAll("[data-ai-name]").forEach((n) => { n.textContent = AI[which].name; });
+    $("t-paste").hidden = false;
+    $("t-paste").dataset.fields = JSON.stringify(fields);
+    $("t-paste").scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  document.querySelectorAll("[data-run]").forEach((b) => b.addEventListener("click", () => startFree(b.dataset.run)));
+  $("t-reopen").addEventListener("click", () => startFree(lastAi));
+
+  // Pull the JSON out of whatever was pasted: a code block, or the outermost braces.
+  function parsePasted(text) {
+    const block = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    let raw = block ? block[1] : text;
+    const a = raw.indexOf("{"), b = raw.lastIndexOf("}");
+    if (a < 0 || b < a) throw new Error("no json");
+    const data = JSON.parse(raw.slice(a, b + 1));
+    if (!Array.isArray(data.applications)) throw new Error("bad shape");
+    const str = (v, max) => String(v ?? "").slice(0, max);
+    return {
+      summary: str(data.summary, 400),
+      applications: data.applications.slice(0, 6).map((ap) => ({
+        company: str(ap.company, 80), role: str(ap.role, 120), posting_url: str(ap.posting_url, 400),
+        people: (Array.isArray(ap.people) ? ap.people : []).slice(0, 6).filter((p) => p && p.name).map((p) => ({
+          name: str(p.name, 80), title: str(p.title, 120), profile_url: str(p.profile_url, 400),
+          connection: str(p.connection, 120), why: str(p.why, 200), note: str(p.note, 400),
+        })),
+      })).filter((ap) => ap.company),
+    };
+  }
+
+  $("t-paste-go").addEventListener("click", () => {
+    const text = $("t-paste-text").value.trim();
+    $("t-error").hidden = true;
+    if (!text) { $("t-paste-text").focus(); return; }
+    try {
+      result = parsePasted(text);
+    } catch {
+      showError("That doesn't look like the results block. Copy the code block at the very end of the chat (it starts with {\"summary\") and paste it again.");
+      return;
+    }
+    result.via = lastAi;
+    try { result.fields = JSON.parse($("t-paste").dataset.fields || "null") || currentFields(); } catch { result.fields = currentFields(); }
+    store.set(KEYS.last, result);
+    $("t-paste").hidden = true;
     renderResults();
     $("t-results").scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-  document.querySelectorAll("[data-demo]").forEach((b) => b.addEventListener("click", (e) => { e.preventDefault(); runSample(); }));
+  });
 
   // Results from before this redesign have a different shape; drop them.
   result = store.get(KEYS.last, null);

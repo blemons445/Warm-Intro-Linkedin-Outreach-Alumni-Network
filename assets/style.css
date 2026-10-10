@@ -359,3 +359,14 @@ fieldset.apps legend { font-weight: 600; font-size: 0.95rem; padding: 0; margin-
   .app-row .del { grid-column: 2; grid-row: 1; }
 }
 
+
+/* Free runs through the visitor's own AI, and pasting results back */
+.run-with { display: grid; gap: 8px; }
+.run-with .actions { gap: 10px; }
+details.code-box summary { cursor: pointer; font-size: 0.9rem; color: var(--muted); }
+details.code-box[open] summary { margin-bottom: 10px; }
+.code-inner { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+.code-inner .code-row { flex: 0 1 260px; }
+.paste-box { gap: 10px; border-left: 4px solid var(--cta); }
+.paste-box h2 { margin: 0; font-size: 1.2rem; }
+.paste-box textarea { font: 0.88rem/1.5 var(--mono); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; width: 100%; resize: vertical; }

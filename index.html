@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/style.css?v=5.1">
+  <link rel="stylesheet" href="assets/style.css?v=6.0">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -23,7 +23,7 @@
       <nav aria-label="Main">
         <a href="#home" data-route="home">Home</a>
         <a href="#try" data-route="try">Try it</a>
-        <a href="#run" data-route="run">Use in Claude</a>
+        <a href="#run" data-route="run">Full skill</a>
         <a href="#tracker" data-route="tracker">Tracker</a>
         <a href="#about" data-route="about">How it was built</a>
         <a href="#connect" data-route="connect">Connect!</a>
@@ -45,9 +45,9 @@
           <p class="lede">Tell Past the Post where you applied. It finds people at each company you share something with, plus the team and recruiters, links their LinkedIn profiles and writes a short first message. Then it helps you turn replies into coffee chats and referrals.</p>
           <div class="actions">
             <a class="btn primary lg" href="#try">Try it free</a>
-            <a class="btn lg" href="#try" data-demo>Watch a sample run</a>
+            <a class="btn lg" href="#about">See how it was built</a>
           </div>
-          <p class="trust"><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> No account needed</span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> You send every message</span></p>
+          <p class="trust"><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> Free with Claude or ChatGPT</span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> You send every message</span></p>
         </div>
         <div class="preview" aria-label="Example of what Past the Post produces">
           <div class="rings" aria-hidden="true"></div>
@@ -128,10 +128,10 @@
 
       <section class="faq" aria-labelledby="faq-h">
         <h2 id="faq-h">Questions</h2>
-        <details><summary>Is it free?</summary><p>Yes. Try it on this site with no account, or run the skill in your own Claude account, which has a free plan.</p></details>
+        <details><summary>Is it free?</summary><p>Yes. Try it hands the search to your own Claude or ChatGPT account, and both have free plans. Nothing is charged to you or anyone else.</p></details>
         <details><summary>Is this a job board?</summary><p>No. Simplify, Intern Insider and others already find jobs. Past the Post starts after you apply and helps you reach the people at those companies.</p></details>
         <details><summary>Does it send messages for me?</summary><p>No. It drafts them and you review and send each one yourself on LinkedIn.</p></details>
-        <details><summary>Do I need an account?</summary><p>No. Add your school and where you applied on Try it, and the site does the searching. Running the skill in Claude with Clay connected finds more people if you want to go deeper.</p></details>
+        <details><summary>Do I need an account?</summary><p>Not on this site. You need a free Claude or ChatGPT account: Try it fills in a new chat for you, it searches, and you paste the results back here as cards with links and notes. The full skill with Clay connected finds more people if you want to go deeper.</p></details>
         <details><summary>Where is my data stored?</summary><p>Your tracker lives only in your own browser. When you use Try it, your answers are sent to Claude to run the search and aren't saved by this site. Use Back up on the Tracker page to keep a copy.</p></details>
         <details><summary>Does it only find alumni?</summary><p>No. Alumni are a great start, but it also looks for people from your hometown, clubs or past jobs, former interns, the team you applied to and the recruiter. It works for any school.</p></details>
       </section>
@@ -143,7 +143,7 @@
           <p>I built Past the Post during my own internship search: the Claude skill, this site, and a serverless backend that runs the search. The case study covers the decisions and what testing changed.</p>
         </div>
         <div class="actions">
-          <a class="btn primary" href="#try" data-demo>Watch a sample run</a>
+          <a class="btn primary" href="#try">Try it</a>
           <a class="btn" href="#about">Read the case study</a>
           <a class="btn" href="https://github.com/blemons445/past-the-post" target="_blank" rel="noopener">View the code</a>
           <a class="btn" href="#connect">Connect with me</a>
@@ -151,7 +151,7 @@
       </section>
 
       <div class="band">
-        <div><h2>Every application deserves a person behind it.</h2><p>Add where you applied. No account needed.</p></div>
+        <div><h2>Every application deserves a person behind it.</h2><p>Add where you applied. Free with your Claude or ChatGPT account.</p></div>
         <a class="btn onband lg" href="#try">Try it free</a>
       </div>
     </section>
@@ -182,12 +182,21 @@
             <label class="wide">Past jobs or internships<input id="t-past" name="past" maxlength="160" placeholder="Target, H-E-B"></label>
           </div>
         </details>
-        <label class="code-row" id="t-code-row" hidden>Access code<input id="t-code" name="code" maxlength="60" autocomplete="off" placeholder="From Bruce"></label>
-        <div class="actions">
-          <button class="btn primary lg" id="t-go" type="submit">Find my people</button>
-          <button class="btn lg" type="button" data-demo>Watch a sample run</button>
+        <div class="run-with">
+          <span class="label">Run it free with your own AI account</span>
+          <div class="actions">
+            <button class="btn primary lg" type="button" data-run="claude">Run free in Claude</button>
+            <button class="btn lg" type="button" data-run="chatgpt">Run free in ChatGPT</button>
+          </div>
+          <p class="src">Opens a new chat with everything filled in. It searches for you, and you paste the results back here. Free plans work. You send every message yourself.</p>
         </div>
-        <p class="src">Free, with no account. You send every message yourself.</p>
+        <details class="code-box" id="t-code-box">
+          <summary>Have an access code? Search right here</summary>
+          <div class="code-inner">
+            <label class="code-row">Access code<input id="t-code" name="code" maxlength="60" autocomplete="off" placeholder="From Bruce"></label>
+            <button class="btn" id="t-go" type="submit">Search here</button>
+          </div>
+        </details>
       </form>
 
       <div class="card progress" id="t-progress" hidden aria-live="polite">
@@ -195,13 +204,22 @@
         <ol class="pg-log" id="t-log"></ol>
       </div>
 
-      <div class="card t-error" id="t-error" role="alert" hidden><p id="t-error-msg"></p><div class="actions"><button class="btn primary small" type="button" data-demo>Watch the sample run</button><a class="btn small" href="#run">Use it free in Claude</a></div></div>
+      <div class="card paste-box" id="t-paste" hidden>
+        <h2>Step 2: paste the results back</h2>
+        <p class="src" id="t-paste-how">When <span data-ai-name>Claude</span> finishes, it ends with a block of results. Click <strong>Copy</strong> on that block and paste it here.</p>
+        <textarea id="t-paste-text" rows="5" placeholder="Paste the results block here"></textarea>
+        <div class="actions">
+          <button class="btn primary" type="button" id="t-paste-go">Show my results</button>
+          <button class="btn" type="button" id="t-reopen">Open <span data-ai-name>Claude</span> again</button>
+        </div>
+      </div>
+
+      <div class="card t-error" id="t-error" role="alert" hidden><p id="t-error-msg"></p><div class="actions"><button class="btn primary small" type="button" data-run="claude">Run free in Claude</button><button class="btn small" type="button" data-run="chatgpt">Run free in ChatGPT</button></div></div>
 
       <div id="t-results" hidden>
         <ol class="stepper" aria-label="Your plan">
           <li><b>1</b>Reach out</li><li><b>2</b>Track replies</li><li><b>3</b>Coffee chat</li><li><b>4</b>Ask for a referral</li>
         </ol>
-        <p class="sample-note" id="t-sample" hidden>Sample run with fictional companies and people, so you can see what a real search returns.</p>
         <div class="res-head">
           <p class="summary" id="t-summary"></p>
           <div class="actions">
@@ -222,7 +240,7 @@
         <h2>4. If the chat goes well, ask for a referral</h2>
         <p class="src">The prep sheet ends with a short, easy-to-decline referral ask for that exact role. Send it after the chat, never in the first message.</p>
         <div id="t-prep" hidden></div>
-        <p class="src">Results come from public web search and can be wrong. Check each profile before you send. Prefer to run it yourself in Claude? <a href="#run">Use the skill</a>.</p>
+        <p class="src">Results come from public web search and can be wrong. Check each profile before you send. Want the deeper version with resume tailoring? <a href="#run">Use the full skill</a>.</p>
       </div>
     </section>
 
@@ -233,12 +251,12 @@
 
       <ol class="checklist" id="setup-list">
         <li>
-          <label><input type="checkbox" data-check="claude"> <strong>Create a Claude account</strong></label>
-          <p>The free plan works. <a href="https://claude.ai" target="_blank" rel="noopener">Open Claude</a></p>
+          <label><input type="checkbox" data-check="claude"> <strong>Create a Claude or ChatGPT account</strong></label>
+          <p>Free plans work. <a href="https://claude.ai" target="_blank" rel="noopener">Open Claude</a> or <a href="https://chatgpt.com" target="_blank" rel="noopener">open ChatGPT</a>.</p>
         </li>
         <li>
           <label><input type="checkbox" data-check="clay"> <strong>Sign up for Clay (free, optional)</strong></label>
-          <p>Clay finds alumni at each company. The free plan includes 100 data credits and 500 actions a month, enough for a few batches. <a href="https://app.clay.com/signup" target="_blank" rel="noopener">Sign up for Clay free</a>. Then connect it in Claude under Settings, Connectors. Without Clay, the tool uses web search instead.</p>
+          <p>Clay finds alumni at each company. The free plan includes 100 data credits and 500 actions a month, enough for a few batches. <a href="https://app.clay.com/signup" target="_blank" rel="noopener">Sign up for Clay free</a>. Then connect it in Claude under Settings, Connectors (ChatGPT may not offer a Clay connection). Without Clay, the tool uses web search instead.</p>
         </li>
         <li>
           <label><input type="checkbox" data-check="linkedin"> <strong>Request your LinkedIn connections</strong></label>
@@ -254,17 +272,18 @@
 
     <!-- RUN -->
     <section class="view" data-view="run" aria-labelledby="run-title" hidden>
-      <h1 id="run-title">Use in Claude</h1>
-      <p class="lede">Prefer to run it yourself? Do the <a href="#setup">one-time setup</a>, copy the skill into a new Claude chat, then work through the steps. Claude asks the questions; each card below tells you what to say to move on.</p>
+      <h1 id="run-title">The full skill</h1>
+      <p class="lede">The deeper version, for Claude or ChatGPT: it can use your LinkedIn connections, Clay and your resume. Do the <a href="#setup">one-time setup</a>, paste the skill into a new chat, then work through the steps.</p>
 
       <div class="card start">
         <div>
-          <h2>1. Give Claude the skill</h2>
-          <p>Copy the skill, open a new Claude chat, paste it in and send. Or download it and add it as a skill in Claude's settings.</p>
+          <h2>1. Give your AI the skill</h2>
+          <p>Copy the skill, open a new chat in Claude or ChatGPT, paste it in and send. In Claude you can also download it and add it as a skill in settings.</p>
         </div>
         <div class="actions">
           <button class="btn primary" id="copy-skill" type="button">Copy skill</button>
-          <a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener">Open a new chat</a>
+          <a class="btn" href="https://claude.ai/new" target="_blank" rel="noopener">Open Claude</a>
+          <a class="btn" href="https://chatgpt.com/" target="_blank" rel="noopener">Open ChatGPT</a>
           <a class="btn" href="skill/SKILL.md" download>Download SKILL.md</a>
         </div>
       </div>
@@ -419,12 +438,12 @@
   <footer class="foot">
     <div class="foot-inner">
       <div><a class="brand" href="#home"><img src="assets/icon.svg" alt="" width="24" height="24"><span>Past the Post</span></a><p>Built by Bruce Hinson, Texas A&amp;M.</p></div>
-      <nav aria-label="Footer"><a href="#try">Try it</a><a href="#run">Use in Claude</a><a href="#tracker">Tracker</a><a href="#about">How it was built</a></nav>
+      <nav aria-label="Footer"><a href="#try">Try it</a><a href="#run">Full skill</a><a href="#tracker">Tracker</a><a href="#about">How it was built</a></nav>
       <nav aria-label="Connect"><a href="https://www.linkedin.com/in/bruce-hinson-713431307" target="_blank" rel="noopener">LinkedIn</a><a href="https://github.com/blemons445/past-the-post" target="_blank" rel="noopener">GitHub</a><a href="#connect">Connect!</a></nav>
     </div>
   </footer>
 
   <div class="toast" id="toast" role="status" hidden></div>
-  <script src="assets/app.js?v=5.2"></script>
+  <script src="assets/app.js?v=6.0"></script>
 </body>
 </html>
