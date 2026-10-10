@@ -321,6 +321,25 @@
     row.append(field("Company", "company", "Keurig Dr Pepper"), field("Role", "role", "Sales Analyst Intern"), field("Posting link (optional)", "url", "https://…", "url"), rm);
     return row;
   }
+  // School, company and role are required. Empty ones get highlighted, and the first one gets focus.
+  function checkForm() {
+    const bad = [];
+    if (!$("t-school").value.trim()) bad.push($("t-school"));
+    const rowsEls = [...$("t-apps").querySelectorAll(".app-row")];
+    const used = rowsEls.filter((r) => [...r.querySelectorAll("input")].some((i) => i.value.trim()));
+    (used.length ? used : rowsEls.slice(0, 1)).forEach((r) => {
+      ["company", "role"].forEach((k) => { const i = r.querySelector(`[data-key=${k}]`); if (!i.value.trim()) bad.push(i); });
+    });
+    document.querySelectorAll("#try-form [aria-invalid]").forEach((i) => i.removeAttribute("aria-invalid"));
+    if (!bad.length) return true;
+    bad.forEach((i) => i.setAttribute("aria-invalid", "true"));
+    const names = [...new Set(bad.map((i) => (i.id === "t-school" ? "your school" : `the ${i.dataset.key}`)))];
+    const list = names.length < 3 ? names.join(" and ") : `${names.slice(0, -1).join(", ")}, and ${names.at(-1)}`;
+    showError(`Fill in ${list} to run the search.`);
+    bad[0].focus();
+    return false;
+  }
+  document.addEventListener("input", (e) => { if (e.target.getAttribute && e.target.getAttribute("aria-invalid")) e.target.removeAttribute("aria-invalid"); });
   function readApps() {
     return [...$("t-apps").querySelectorAll(".app-row")].map((r) => {
       const a = {};
@@ -537,7 +556,7 @@
     store.set(KEYS.form, fields);
     const code = $("t-code").value.trim();
     if (code) store.set(KEYS.code, code);
-    if (!fields.apps.length) { showError("Add at least one company you applied to."); $("t-apps").querySelector("input").focus(); return; }
+    if (!checkForm()) return;
     runSearch(fields);
   });
 
@@ -686,7 +705,7 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
     const fields = currentFields();
     store.set(KEYS.form, fields);
     $("t-error").hidden = true;
-    if (!fields.apps.length) { showError("Add at least one company you applied to."); $("t-apps").querySelector("input").focus(); return; }
+    if (!checkForm()) return;
     openAssistant(which, searchPrompt(fields));
     document.querySelectorAll("[data-ai-name]").forEach((n) => { n.textContent = AI[which].name; });
     $("t-paste-step").innerHTML = AI[which].paste
