@@ -1,4 +1,4 @@
-// Warm Intro: hash routing, the Try it search, setup and run checklists, and a tracker saved in localStorage.
+// Past the Post: hash routing, the Try it search, setup and run checklists, and a tracker saved in localStorage.
 (() => {
   "use strict";
 
@@ -50,7 +50,7 @@
       else a.removeAttribute("aria-current");
     });
     const view = document.querySelector(`[data-view="${name}"] h1`);
-    document.title = (name === "home" ? "Warm Intro: AI internship outreach for students" : `${view.textContent} · Warm Intro`);
+    document.title = (name === "home" ? "Past the Post: meet the people behind your applications" : `${view.textContent} · Past the Post`);
     if (route.ready) { window.scrollTo(0, 0); $("main").focus({ preventScroll: true }); }
     route.ready = true;
     if (name === "try") document.querySelectorAll("#t-groups .note").forEach((n) => n.dispatchEvent(new Event("input")));
@@ -246,11 +246,11 @@
     const cols = ["kind", "name", "company", "detail", "link", "date", "status"];
     const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const csv = [cols.join(","), ...rows.map((r) => cols.map((c) => esc(r[c])).join(","))].join("\n");
-    download(`warm-intro-tracker-${today()}.csv`, csv, "text/csv");
+    download(`past-the-post-tracker-${today()}.csv`, csv, "text/csv");
   });
 
   $("export-json").addEventListener("click", () => {
-    download(`warm-intro-backup-${today()}.json`, JSON.stringify({ app: "warm-intro", version: 1, rows }, null, 2), "application/json");
+    download(`past-the-post-backup-${today()}.json`, JSON.stringify({ app: "past-the-post", version: 1, rows }, null, 2), "application/json");
   });
 
   $("import-json").addEventListener("change", async (e) => {
@@ -264,7 +264,7 @@
       if (rows.length && !confirm(`Replace your ${rows.length} current entries with ${incoming.length} from the backup?`)) return;
       rows = incoming.map((r) => ({ ...r, id: r.id || uid() }));
       save(); renderTracker(); toast(`Restored ${rows.length} entries`);
-    } catch { toast("That file isn't a Warm Intro backup."); }
+    } catch { toast("That file isn't a Past the Post backup."); }
   });
 
   // Fictional sample data so visitors can see the tracker working.
@@ -686,6 +686,47 @@
   // Results from before this redesign have a different shape; drop them.
   result = store.get(KEYS.last, null);
   if (result && !Array.isArray(result.applications)) result = null;
+
+  // ---------- Home: scroll story ----------
+  // Each step's text drives the sticky graphic beside it; works without JS as plain steps.
+  (function story() {
+    const stage = $("story-stage");
+    if (!stage) return;
+    const steps = [...document.querySelectorAll(".story-steps li")];
+    const NOTE = "Hi Jordan, fellow Aggie here! I just applied for Acme's Summer Sales internship. What do you wish you'd known before joining the team?";
+    const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let typed = false, timer = null;
+    function type() {
+      if (typed) return;
+      typed = true;
+      const out = $("st-type"), count = $("st-count");
+      if (still) { out.textContent = NOTE; count.textContent = `${NOTE.length} / 200`; return; }
+      let i = 0;
+      timer = setInterval(() => {
+        i = Math.min(NOTE.length, i + 2);
+        out.textContent = NOTE.slice(0, i);
+        count.textContent = `${i} / 200`;
+        if (i >= NOTE.length) clearInterval(timer);
+      }, 22);
+    }
+    function show(n) {
+      stage.dataset.step = n;
+      steps.forEach((li) => li.classList.toggle("active", Number(li.dataset.step) === n));
+      if (n >= 3) type();
+    }
+    // On phones the graphic sits on top, so steps switch lower in the viewport, below it.
+    const phone = matchMedia("(max-width: 760px)").matches;
+    const fitTop = () => stage.style.setProperty("--story-top", `${document.querySelector(".top").offsetHeight + 8}px`);
+    fitTop();
+    addEventListener("resize", fitTop);
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (e.isIntersecting) show(Number(e.target.dataset.step)); });
+    }, { rootMargin: phone ? "-68% 0px -30% 0px" : "-45% 0px -45% 0px" });
+    steps.forEach((li) => {
+      io.observe(li);
+      li.addEventListener("click", () => show(Number(li.dataset.step)));
+    });
+  })();
 
   // ---------- Start ----------
   renderRunSteps();

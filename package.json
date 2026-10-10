@@ -1,5 +1,5 @@
 {
-  "name": "warm-intro",
+  "name": "past-the-post",
   "private": true,
   "type": "module",
   "engines": { "node": ">=20" },

@@ -1,14 +1,16 @@
-# Warm Intro
+# Past the Post
 
-**Turn applications into conversations.** You tell Warm Intro where you've applied. It finds people at each company you share something with (school, hometown, clubs, past jobs), plus the team and recruiters, links their LinkedIn profiles, drafts a short first message, and helps you turn replies into coffee chats and referrals. It isn't a job board: Simplify and others already find jobs. Warm Intro starts after you apply.
+*Behind the posting: meet the people at the companies you applied to.*
+
+**Turn applications into conversations.** You tell Past the Post where you've applied. It finds people at each company you share something with (school, hometown, clubs, past jobs), plus the team and recruiters, links their LinkedIn profiles, drafts a short first message, and helps you turn replies into coffee chats and referrals. It isn't a job board: Simplify and others already find jobs. Past the Post starts after you apply.
 
 **Live app:** https://warm-intro-linkedin-outreach-alumni.vercel.app/
 
-![Warm Intro tracker](docs/tracker.png)
+![Past the Post tracker](docs/tracker.png)
 
 ## Why
 
-Referrals are only 6 to 7% of job applications but 30 to 50% of hires ([Chanty](https://www.chanty.com/blog/employee-referral-statistics/), citing Zippia, SHRM and Forbes Agency Council). Most students know they should network, but not who to message or what to say. Warm Intro does the research and leaves the conversations to you.
+Referrals are only 6 to 7% of job applications but 30 to 50% of hires ([Chanty](https://www.chanty.com/blog/employee-referral-statistics/), citing Zippia, SHRM and Forbes Agency Council). Most students know they should network, but not who to message or what to say. Past the Post does the research and leaves the conversations to you.
 
 ## What it does
 
@@ -34,7 +36,7 @@ No install and no account on this site. The tracker is stored in your own browse
 
 ## How it was built
 
-Warm Intro is two parts:
+Past the Post is two parts:
 
 - **The skill** ([`skill/SKILL.md`](skill/SKILL.md)): the instructions Claude follows. It uses Clay to find people and web search to check postings.
 - **The web app** (`index.html`, `assets/`): a plain HTML, CSS and JavaScript site with no build step. It runs the one-page search, hands the skill to Claude for deeper runs, and keeps the tracker.

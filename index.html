@@ -3,22 +3,22 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Warm Intro: AI internship outreach for students</title>
+  <title>Past the Post: meet the people behind your applications</title>
   <meta name="description" content="A free tool for students who have already applied: it finds people worth messaging at each company, writes short LinkedIn messages and turns replies into coffee chats and referrals.">
   <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/style.css?v=4.0">
+  <link rel="stylesheet" href="assets/style.css?v=5.0">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
   <header class="top">
     <div class="top-inner">
-      <a class="brand" href="#home" aria-label="Warm Intro home">
+      <a class="brand" href="#home" aria-label="Past the Post home">
         <img src="assets/icon.svg" alt="" width="28" height="28">
-        <span>Warm Intro</span>
+        <span>Past the Post</span>
       </a>
       <nav aria-label="Main">
         <a href="#home" data-route="home">Home</a>
@@ -42,14 +42,14 @@
         <div class="hero">
           <p class="badge">Free for students · Powered by Claude</p>
           <h1 id="home-title">You applied. Now meet the <span class="hl">people</span> behind the posting.</h1>
-          <p class="lede">Tell Warm Intro where you applied. It finds people at each company you share something with, plus the team and recruiters, links their LinkedIn profiles and writes a short first message. Then it helps you turn replies into coffee chats and referrals.</p>
+          <p class="lede">Tell Past the Post where you applied. It finds people at each company you share something with, plus the team and recruiters, links their LinkedIn profiles and writes a short first message. Then it helps you turn replies into coffee chats and referrals.</p>
           <div class="actions">
             <a class="btn primary lg" href="#try">Try it free</a>
             <a class="btn lg" href="#try" data-demo>Watch a sample run</a>
           </div>
           <p class="trust"><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> No account needed</span><span><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg> You send every message</span></p>
         </div>
-        <div class="preview" aria-label="Example of what Warm Intro produces">
+        <div class="preview" aria-label="Example of what Past the Post produces">
           <div class="rings" aria-hidden="true"></div>
           <div class="pv-card pv-a">
             <div class="pv-row"><span class="avatar" aria-hidden="true">JL</span><div><div class="pv-name">Jordan Lee</div><div class="pv-sub">Sales Coordinator · Acme Foods</div></div><span class="chip">Alum '23</span></div>
@@ -63,6 +63,40 @@
           <p class="src pv-note">Example data</p>
         </div>
       </div>
+
+      <section class="story" aria-labelledby="story-h">
+        <p class="kicker">How it works</p>
+        <h2 id="story-h">Get past the post in five steps</h2>
+        <div class="story-grid">
+          <ol class="story-steps">
+            <li data-step="1" class="active"><span class="sn">01</span><h3>You apply</h3><p>Your application lands in a pile with hundreds of others. Add it to Past the Post, or pull it straight from your tracker.</p></li>
+            <li data-step="2"><span class="sn">02</span><h3>Find the people behind the posting</h3><p>It searches for people at that company you share something with: your school, hometown, a club or a past job. Then former interns, the team and the recruiter, each with a LinkedIn link.</p></li>
+            <li data-step="3"><span class="sn">03</span><h3>Send one short note</h3><p>A first message under LinkedIn's 200-character limit that opens with what you share and asks one easy question. You review it and send it yourself.</p></li>
+            <li data-step="4"><span class="sn">04</span><h3>Turn a reply into a coffee chat</h3><p>When someone writes back, you get a prep sheet: their background, your 20-second intro and the questions to ask.</p></li>
+            <li data-step="5"><span class="sn">05</span><h3>Ask for the referral</h3><p>If the chat goes well, a short, easy-to-decline referral ask for that exact role. Now your application has a person behind it.</p></li>
+          </ol>
+          <div class="story-stage" id="story-stage" data-step="1" aria-hidden="true">
+            <div class="st-progress"><span></span></div>
+            <div class="st-post">
+              <div class="st-post-top"><span class="st-logo">A</span><div><div class="pv-name">Summer Sales Intern</div><div class="pv-sub">Acme Foods · Dallas, TX</div></div></div>
+              <div class="st-lines"><i></i><i></i><i style="width:60%"></i></div>
+              <div class="st-pile">+ 412 other applicants</div>
+              <span class="st-stamp">Applied</span>
+            </div>
+            <div class="st-people">
+              <div class="st-person p1"><span class="avatar">JL</span><div><div class="pv-name">Jordan Lee</div><div class="pv-sub">Sales Coordinator</div></div><span class="chip">Same school</span></div>
+              <div class="st-person p2"><span class="avatar">MH</span><div><div class="pv-name">Marcus Hill</div><div class="pv-sub">Brand Manager</div></div><span class="chip">Same hometown</span></div>
+              <div class="st-person p3"><span class="avatar">PS</span><div><div class="pv-name">Priya Shah</div><div class="pv-sub">Campus Recruiter</div></div><span class="chip">Recruiter</span></div>
+            </div>
+            <div class="st-chat">
+              <div class="st-msg out"><span class="st-type" id="st-type"></span><span class="st-count" id="st-count">0 / 200</span></div>
+              <div class="st-msg in">Happy to help! Want to grab a quick call Thursday?</div>
+              <div class="st-prep"><b>Chat prep</b><span>Your intro</span><span>5 questions</span><span>Thank-you note</span></div>
+              <div class="st-ref"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> Jordan referred you to the recruiter</div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section class="statband" aria-labelledby="why-h">
         <h2 id="why-h">Referrals are the shortcut most students skip</h2>
@@ -78,7 +112,7 @@
         <div class="f-text">
           <p class="kicker">Step 1</p>
           <h2>Start from applications you've already sent</h2>
-          <p>This isn't another job board. Add the companies and roles you applied to, or fill them straight from your tracker, and Warm Intro works on getting you noticed for those.</p>
+          <p>This isn't another job board. Add the companies and roles you applied to, or fill them straight from your tracker, and Past the Post works on getting you noticed for those.</p>
         </div>
         <div class="f-visual" aria-hidden="true">
           <div class="pv-card">
@@ -129,7 +163,7 @@
       <section class="faq" aria-labelledby="faq-h">
         <h2 id="faq-h">Questions</h2>
         <details><summary>Is it free?</summary><p>Yes. Try it on this site with no account, or run the skill in your own Claude account, which has a free plan.</p></details>
-        <details><summary>Is this a job board?</summary><p>No. Simplify, Intern Insider and others already find jobs. Warm Intro starts after you apply and helps you reach the people at those companies.</p></details>
+        <details><summary>Is this a job board?</summary><p>No. Simplify, Intern Insider and others already find jobs. Past the Post starts after you apply and helps you reach the people at those companies.</p></details>
         <details><summary>Does it send messages for me?</summary><p>No. It drafts them and you review and send each one yourself on LinkedIn.</p></details>
         <details><summary>Do I need an account?</summary><p>No. Add your school and where you applied on Try it, and the site does the searching. Running the skill in Claude with Clay connected finds more people if you want to go deeper.</p></details>
         <details><summary>Where is my data stored?</summary><p>Your tracker lives only in your own browser. When you use Try it, your answers are sent to Claude to run the search and aren't saved by this site. Use Back up on the Tracker page to keep a copy.</p></details>
@@ -140,7 +174,7 @@
         <div>
           <p class="kicker">Reviewing my work?</p>
           <h2 id="recruit-h">Built by Bruce Hinson, Texas A&amp;M marketing</h2>
-          <p>I built Warm Intro during my own internship search: the Claude skill, this site, and a serverless backend that runs the search. The case study covers the decisions and what testing changed.</p>
+          <p>I built Past the Post during my own internship search: the Claude skill, this site, and a serverless backend that runs the search. The case study covers the decisions and what testing changed.</p>
         </div>
         <div class="actions">
           <a class="btn primary" href="#try" data-demo>Watch a sample run</a>
@@ -159,7 +193,7 @@
     <!-- TRY -->
     <section class="view" data-view="try" aria-labelledby="try-title" hidden>
       <h1 id="try-title">Try it</h1>
-      <p class="lede">Already applied? Tell us where. Warm Intro finds people at each company you share something with, plus the team and recruiters, links their LinkedIn profiles and writes your first message, so your application has a person behind it.</p>
+      <p class="lede">Already applied? Tell us where. Past the Post finds people at each company you share something with, plus the team and recruiters, links their LinkedIn profiles and writes your first message, so your application has a person behind it.</p>
 
       <form class="card try-form" id="try-form" novalidate>
         <label class="school">Your school<input id="t-school" name="school" maxlength="80" placeholder="Texas A&amp;M University" autocomplete="organization"></label>
@@ -356,7 +390,7 @@
     <!-- ABOUT -->
     <section class="view prose" data-view="about" aria-labelledby="about-title" hidden>
       <h1 id="about-title">How it was built</h1>
-      <p class="lede">I built Warm Intro during my own Summer 2027 internship search as a junior marketing major at Texas A&amp;M. Every rule in it came from something that went wrong or right in real use.</p>
+      <p class="lede">I built Past the Post during my own Summer 2027 internship search as a junior marketing major at Texas A&amp;M. Every rule in it came from something that went wrong or right in real use.</p>
 
       <h2>The problem</h2>
       <p>Applying online feels like sending resumes into a void. Referrals are a small share of applications but a large share of hires, yet most students don't know who to message or what to say. I wanted a tool that does the research and leaves the conversations to me.</p>
@@ -399,11 +433,11 @@
     <!-- CONNECT -->
     <section class="view prose" data-view="connect" aria-labelledby="connect-title" hidden>
       <h1 id="connect-title">Connect!</h1>
-      <p class="lede">I'm Bruce Hinson, a junior marketing major at Texas A&amp;M looking for a Summer 2027 sales or marketing internship in Dallas-Fort Worth. I built Warm Intro during my own search.</p>
+      <p class="lede">I'm Bruce Hinson, a junior marketing major at Texas A&amp;M looking for a Summer 2027 sales or marketing internship in Dallas-Fort Worth. I built Past the Post during my own search.</p>
       <div class="card connect">
         <div>
           <h2>Let's talk</h2>
-          <p>Tried Warm Intro, have feedback, or want to talk about an internship? Send me a connection request on LinkedIn.</p>
+          <p>Tried Past the Post, have feedback, or want to talk about an internship? Send me a connection request on LinkedIn.</p>
         </div>
         <div class="actions">
           <a class="btn primary" href="https://www.linkedin.com/in/bruce-hinson-713431307" target="_blank" rel="noopener">
@@ -418,13 +452,13 @@
 
   <footer class="foot">
     <div class="foot-inner">
-      <div><a class="brand" href="#home"><img src="assets/icon.svg" alt="" width="24" height="24"><span>Warm Intro</span></a><p>Built by Bruce Hinson, Texas A&amp;M.</p></div>
+      <div><a class="brand" href="#home"><img src="assets/icon.svg" alt="" width="24" height="24"><span>Past the Post</span></a><p>Built by Bruce Hinson, Texas A&amp;M.</p></div>
       <nav aria-label="Footer"><a href="#try">Try it</a><a href="#run">Use in Claude</a><a href="#tracker">Tracker</a><a href="#about">How it was built</a></nav>
       <nav aria-label="Connect"><a href="https://www.linkedin.com/in/bruce-hinson-713431307" target="_blank" rel="noopener">LinkedIn</a><a href="https://github.com/blemons445/Warm-Intro-Linkedin-Outreach-Alumni-Network" target="_blank" rel="noopener">GitHub</a><a href="#connect">Connect!</a></nav>
     </div>
   </footer>
 
   <div class="toast" id="toast" role="status" hidden></div>
-  <script src="assets/app.js?v=4.1"></script>
+  <script src="assets/app.js?v=5.0"></script>
 </body>
 </html>
