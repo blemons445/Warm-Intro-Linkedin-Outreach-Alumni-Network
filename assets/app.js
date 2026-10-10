@@ -400,7 +400,7 @@
       const n = note.value.length; count.textContent = `${n} / 200`; count.classList.toggle("over", n > 200); p.note = note.value;
       if (note.offsetParent) { note.style.height = "auto"; note.style.height = `${note.scrollHeight + 2}px`; }
     };
-    note.addEventListener("input", () => { upd(); if (!result.sample) store.set(KEYS.last, result); });
+    note.addEventListener("input", () => { upd(); if (result && !result.sample) store.set(KEYS.last, result); });
     upd();
     c.append(note, count);
 
@@ -454,7 +454,7 @@
   function renderResults() {
     const r = result;
     $("t-results").hidden = !r;
-    if (!r) return;
+    if (!r) { $("t-groups").replaceChildren(); return; }
     $("t-sample").hidden = !r.sample;
     $("t-prep").hidden = true; $("t-prep").replaceChildren();
     $("t-summary").textContent = r.summary || "";
