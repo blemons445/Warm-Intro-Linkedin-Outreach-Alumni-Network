@@ -5,8 +5,8 @@
   --surface: #ffffff;
   --tint: #faf6f6;
   --fg: #1a1414;
-  --muted: #5c5252;
-  --line: #ece4e4;
+  --muted: #3d3434;
+  --line: #d6c8c8;
   --accent: #500000;
   --accent-soft: #f6eded;
   --link: #6b0f1a;
@@ -25,14 +25,14 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0e0e10; --surface: #17171a; --tint: #131315; --fg: #f4f4f5; --muted: #a1a1aa; --line: #27272a;
+    --bg: #0e0e10; --surface: #17171a; --tint: #131315; --fg: #f4f4f5; --muted: #c8c8d0; --line: #3f3f46;
     --accent: #d8a7ad; --accent-soft: #241a1c; --link: #e2b8bd; --cta: #8c1d2c; --on-cta: #ffffff;
     --good: #4ade80; --bad: #f87171; --band: #1c1517; --on-band: #f4f4f5; --shadow: 0 1px 0 rgb(255 255 255 / 3%) inset, 0 8px 24px rgb(0 0 0 / 35%);
     --num: #f4f4f5; --hl: #f4f4f5; --hl-bar: #8c1d2c; --chip-bg: #1f1f23; --chip-fg: #e4e4e7; --band-line: #3a2a2d; color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0e0e10; --surface: #17171a; --tint: #131315; --fg: #f4f4f5; --muted: #a1a1aa; --line: #27272a;
+  --bg: #0e0e10; --surface: #17171a; --tint: #131315; --fg: #f4f4f5; --muted: #c8c8d0; --line: #3f3f46;
     --accent: #d8a7ad; --accent-soft: #241a1c; --link: #e2b8bd; --cta: #8c1d2c; --on-cta: #ffffff;
     --good: #4ade80; --bad: #f87171; --band: #1c1517; --on-band: #f4f4f5; --shadow: 0 1px 0 rgb(255 255 255 / 3%) inset, 0 8px 24px rgb(0 0 0 / 35%);
     --num: #f4f4f5; --hl: #f4f4f5; --hl-bar: #8c1d2c; --chip-bg: #1f1f23; --chip-fg: #e4e4e7; --band-line: #3a2a2d; color-scheme: dark;
@@ -309,9 +309,11 @@ details.more[open] summary { margin-bottom: 12px; }
 .res-top { display: flex; align-items: center; gap: 10px; justify-content: space-between; }
 .res-top > div { flex: 1; min-width: 0; }
 .res-card .chip { justify-self: start; white-space: normal; }
-.res-card .why { color: var(--muted); font-size: 0.92rem; }
+.res-card .why { color: var(--fg); font-size: 0.95rem; line-height: 1.55; }
+.res-card .pv-name { font-size: 1.05rem; }
+.res-card .chip { font-size: 0.82rem; }
 .res-card .actions { gap: 8px; }
-.note { font: 0.92rem/1.5 var(--body); color: var(--fg); background: var(--tint); border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; width: 100%; }
+.note { font: 0.97rem/1.55 var(--body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 10px; resize: vertical; width: 100%; }
 .note-meta { font-size: 0.8rem; color: var(--muted); text-align: right; margin-top: -6px; }
 .note-meta.over { color: var(--bad); font-weight: 600; }
 .res-list .empty { color: var(--muted); grid-column: 1 / -1; }

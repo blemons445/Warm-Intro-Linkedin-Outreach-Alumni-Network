@@ -714,7 +714,7 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
         company: str(ap.company, 80), role: str(ap.role, 120), posting_url: str(ap.posting_url, 400),
         people: (Array.isArray(ap.people) ? ap.people : []).slice(0, 6).filter((p) => p && p.name).map((p) => ({
           name: str(p.name, 80), title: str(p.title, 120), profile_url: str(p.profile_url, 400),
-          hiring_manager: p.hiring_manager === true, connection: str(p.connection, 120), why: str(p.why, 200), note: str(p.note, 400),
+          hiring_manager: p.hiring_manager === true, connection: str(p.connection, 120), why: str(p.why, 320), note: str(p.note, 400),
         })),
       })).filter((ap) => ap.company),
     };
