@@ -11,11 +11,12 @@ const ALLOWED_ORIGINS = [
 
 const FIELDS = {
   school: 80, major: 60, year: 20, city: 60, kind: 80, term: 30, companies: 200, name: 60, code: 60,
+  mode: 10, p_name: 80, p_title: 120, p_company: 80, p_connection: 120, p_role: 120,
 };
 
-// Light per-instance throttle so one visitor can't run up the bill.
-const recent = new Map();
-const LIMIT = 3;
+// Light per-instance throttle so one visitor can't run up the bill. Chat prep is much cheaper than a search.
+const recent = { search: new Map(), prep: new Map() };
+const LIMIT = { search: 3, prep: 10 };
 const WINDOW_MS = 60 * 60 * 1000;
 
 const SUBMIT_TOOL = {
@@ -64,6 +65,37 @@ const SUBMIT_TOOL = {
   },
 };
 
+const PREP_TOOL = {
+  name: "submit_prep",
+  description: "Return the coffee chat prep sheet. Call once, at the end.",
+  strict: true,
+  input_schema: {
+    type: "object",
+    additionalProperties: false,
+    required: ["about", "company_now", "intro", "questions", "thank_you"],
+    properties: {
+      about: { type: "string", description: "Two or three sentences on the person's role and path, only from what you found or were given." },
+      company_now: { type: "string", description: "One or two recent, relevant facts about the company or team, with no speculation." },
+      intro: { type: "string", description: "The student's 20-second spoken intro, first person." },
+      questions: { type: "array", items: { type: "string" }, description: "Four or five specific questions to ask." },
+      thank_you: { type: "string", description: "A short thank-you message to send after the chat." },
+    },
+  },
+};
+
+function prepPrompt(f) {
+  return `A college student has a 15-minute coffee chat coming up. Write a short prep sheet.
+
+Student: ${f.name || "(name not given)"}, ${f.year || ""} ${f.major || ""} at ${f.school}, looking for ${f.kind} in ${f.city}${f.term ? `, ${f.term}` : ""}.
+Person: ${f.p_name}, ${f.p_title} at ${f.p_company}. Connection: ${f.p_connection || "same school"}.
+Role the student is applying for: ${f.p_role || "an internship at the company"}.
+
+Use web search briefly for the person's public background and recent company news. Don't invent details; if you can't find something, keep that part general.
+The intro should be natural and under 60 words. Questions should be about their work and advice, not asking for a referral. The thank-you note should be 2 or 3 sentences and mention one thing to fill in from the chat as [something they said].
+
+When done, call submit_prep once. Don't write the sheet as text.`;
+}
+
 function systemPrompt(f) {
   return `You help a college student land an internship through people, not portals.
 
@@ -109,31 +141,36 @@ export async function POST(request) {
   const headers = cors(request.headers.get("origin"));
   const json = (status, obj) => new Response(JSON.stringify(obj), { status, headers: { ...headers, "Content-Type": "application/json" } });
 
-  if (!process.env.ANTHROPIC_API_KEY) return json(500, { error: "The site isn't set up yet: the server has no API key." });
+  // No key set means live search is switched off; the page offers the sample run instead.
+  if (!process.env.ANTHROPIC_API_KEY) return json(503, { error: "Live search is invite-only right now. Watch the sample run to see exactly what it returns, or run the full tool free in your own Claude account.", live_off: true });
 
   let f;
   try { f = clean(await request.json()); } catch { return json(400, { error: "Bad request." }); }
   if (!f.school || !f.kind || !f.city) return json(400, { error: "School, internship type and city are required." });
+  const mode = f.mode === "prep" ? "prep" : "search";
+  if (mode === "prep" && (!f.p_name || !f.p_company)) return json(400, { error: "Missing who the chat is with." });
 
   // Optional: set ACCESS_CODE in Vercel to limit live searches to people you've given the code.
   const code = process.env.ACCESS_CODE;
   if (code && f.code.toLowerCase() !== code.toLowerCase()) {
-    return json(401, { error: f.code ? "That access code didn't work." : "Live search needs an access code.", code_required: true });
+    return json(401, { error: f.code ? "That access code didn't work." : "Live search is invite-only. Enter your access code, or watch the sample run to see exactly what it returns.", code_required: true });
   }
 
   const ip = (request.headers.get("x-forwarded-for") || "").split(",")[0].trim() || "unknown";
   const now = Date.now();
-  const hits = (recent.get(ip) || []).filter((t) => now - t < WINDOW_MS);
-  if (hits.length >= LIMIT) return json(429, { error: "You've run a few searches this hour. Try again later." });
-  recent.set(ip, [...hits, now]);
+  const hits = (recent[mode].get(ip) || []).filter((t) => now - t < WINDOW_MS);
+  if (hits.length >= LIMIT[mode]) return json(429, { error: "You've hit this hour's limit. Try again later." });
+  recent[mode].set(ip, [...hits, now]);
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
       const send = (obj) => controller.enqueue(encoder.encode(JSON.stringify(obj) + "\n"));
       try {
-        send({ type: "status", text: "Reading your target" });
-        const result = await run(f, send);
+        send({ type: "status", text: mode === "prep" ? `Looking up ${f.p_name}` : "Reading your target" });
+        const result = mode === "prep"
+          ? await run({ system: prepPrompt(f), ask: "Write my coffee chat prep sheet.", tool: PREP_TOOL, searches: 3 }, send)
+          : await run({ system: systemPrompt(f), ask: "Find my internships, people and draft notes.", tool: SUBMIT_TOOL, searches: 10 }, send);
         send({ type: "result", data: result });
       } catch (err) {
         send({ type: "error", error: friendly(err) });
@@ -148,8 +185,8 @@ export async function POST(request) {
   });
 }
 
-async function run(f, send) {
-  const messages = [{ role: "user", content: "Find my internships, people and draft notes." }];
+async function run({ system, ask, tool, searches }, send) {
+  const messages = [{ role: "user", content: ask }];
 
   // pause_turn means the server paused a long search; re-send to let it continue.
   for (let round = 0; round < 5; round++) {
@@ -160,8 +197,8 @@ async function run(f, send) {
       fallbacks: "default",
       thinking: { type: "adaptive" },
       output_config: { effort: "low" },
-      system: systemPrompt(f),
-      tools: [{ type: "web_search_20260209", name: "web_search", max_uses: 10 }, SUBMIT_TOOL],
+      system,
+      tools: [{ type: "web_search_20260209", name: "web_search", max_uses: searches }, tool],
       messages,
     });
 
@@ -175,7 +212,7 @@ async function run(f, send) {
 
     if (msg.stop_reason === "refusal") throw new UserError("The search was declined. Try rewording your target.");
 
-    const submit = msg.content.find((b) => b.type === "tool_use" && b.name === "submit_results");
+    const submit = msg.content.find((b) => b.type === "tool_use" && b.name === tool.name);
     if (submit) return submit.input;
 
     if (msg.stop_reason === "pause_turn") {
@@ -186,7 +223,7 @@ async function run(f, send) {
 
     // Ended with text instead of the tool: ask once more for the structured result.
     messages.push({ role: "assistant", content: msg.content });
-    messages.push({ role: "user", content: "Now call submit_results with what you found." });
+    messages.push({ role: "user", content: `Now call ${tool.name} with what you found.` });
   }
   throw new UserError("The search didn't finish. Try again with a narrower target.");
 }

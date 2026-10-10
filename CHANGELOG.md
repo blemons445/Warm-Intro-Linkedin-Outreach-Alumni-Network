@@ -2,6 +2,11 @@
 
 How Warm Intro got to where it is. Each change came from using it on a real internship search.
 
+## 1.2.0 (Oct 10, 2026): The full flow on one page
+- Results now walk through four steps: apply, message, track and prep for the chat.
+- "They replied: prep me" on any person builds a coffee chat sheet: their background, company news, a 20-second intro, questions to ask and a thank-you note.
+- Live search is invite-only (an access code, or switched off when no key is set); the sample run shows the whole flow, prep included, for free.
+
 ## 1.1.0 (Oct 10, 2026): One-page search
 - New **Try it** page: three fields and one button. The site searches for open postings and alumni, drafts a note for each person and streams its progress while it works.
 - Copying a note adds that person to the tracker; "I applied" logs the application. Results stay on the page after a refresh.

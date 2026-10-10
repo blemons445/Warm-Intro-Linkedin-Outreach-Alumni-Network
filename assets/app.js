@@ -192,6 +192,7 @@
 
   function renderTotals() {
     const c = counts();
+    if (result) trackStep();
     $("n-sent").textContent = c.sent; $("n-replied").textContent = c.replied; $("n-chat").textContent = c.chat;
     $("n-apps").textContent = c.apps; $("n-int").textContent = c.ints;
     $("post-line").textContent = postLine(c);
@@ -388,6 +389,10 @@
     prof.href = safeUrl(p.profile_url) || linkedinSearch(p);
     prof.target = "_blank"; prof.rel = "noopener";
     if (result.sample) acts.append(copy, add); else acts.append(copy, prof, add);
+    const prep = el("button", "btn small ghost", "They replied: prep me");
+    prep.type = "button";
+    prep.addEventListener("click", () => openPrep(p, prep));
+    acts.append(prep);
     c.append(acts);
     return c;
   }
@@ -397,6 +402,8 @@
     $("t-results").hidden = !r;
     if (!r) return;
     $("t-sample").hidden = !r.sample;
+    $("t-prep").hidden = true; $("t-prep").replaceChildren();
+    trackStep();
     $("t-summary").textContent = r.summary || "";
     const post = r.postings || [], ppl = r.people || [];
     $("t-c-post").textContent = post.length ? `· ${post.length}` : "";
@@ -418,52 +425,149 @@
     $("t-log").append(li);
   }
 
+  // Calls the backend and reads its newline-delimited JSON stream.
+  async function callApi(fields, onStatus) {
+    const res = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields) });
+    if (!res.ok || !res.body) {
+      const data = await res.json().catch(() => ({}));
+      if (data.code_required) { showCode(); }
+      throw new Error(data.error || "Something went wrong. Try again.");
+    }
+    const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
+    let buf = "", out = null;
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      buf += value;
+      let i;
+      while ((i = buf.indexOf("\n")) >= 0) {
+        const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
+        if (!line) continue;
+        const ev = JSON.parse(line);
+        if (ev.type === "status") onStatus(ev.text);
+        else if (ev.type === "error") throw new Error(ev.error);
+        else if (ev.type === "result") out = ev.data;
+      }
+    }
+    if (!out) throw new Error("It stopped early. Try again.");
+    return out;
+  }
+  const errText = (err) => (err instanceof TypeError ? "Couldn't reach the search service. Check your connection and try again." : err.message);
+
+  function currentFields() {
+    const fields = {};
+    TRY_FIELDS.forEach((k) => { fields[k] = $(`t-${k}`).value.trim(); });
+    return fields;
+  }
+
   async function runSearch(fields) {
     $("t-error").hidden = true;
     $("t-log").replaceChildren();
     result = null; renderResults();
     setBusy(true);
-    let gotResult = false;
     try {
-      const res = await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(fields) });
-      if (!res.ok || !res.body) {
-        const data = await res.json().catch(() => ({}));
-        if (data.code_required) { showCode(); $("t-code").focus(); }
-        throw new Error(data.error || "Something went wrong. Try again.");
-      }
-      const reader = res.body.pipeThrough(new TextDecoderStream()).getReader();
-      let buf = "";
-      for (;;) {
-        const { value, done } = await reader.read();
-        if (done) break;
-        buf += value;
-        let i;
-        while ((i = buf.indexOf("\n")) >= 0) {
-          const line = buf.slice(0, i).trim(); buf = buf.slice(i + 1);
-          if (!line) continue;
-          const ev = JSON.parse(line);
-          if (ev.type === "status") logLine(ev.text);
-          else if (ev.type === "error") throw new Error(ev.error);
-          else if (ev.type === "result") { result = ev.data; gotResult = true; }
-        }
-      }
-      if (!gotResult) throw new Error("The search stopped early. Try again.");
+      result = await callApi(fields, logLine);
+      result.fields = fields;
       store.set(KEYS.last, result);
       renderResults();
       $("t-results").scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err) {
-      const msg = err instanceof TypeError ? "Couldn't reach the search service. Check your connection and try again." : err.message;
-      $("t-error-msg").textContent = msg;
+      if ($("t-code-row").hidden === false) $("t-code").focus();
+      $("t-error-msg").textContent = errText(err);
       $("t-error").hidden = false;
     } finally {
       setBusy(false);
     }
   }
 
+  // ---------- Coffee chat prep ----------
+  function samplePrep(p) {
+    const first = p.name.split(" ")[0];
+    return {
+      about: `${first} is a ${p.title} at ${p.company} and a ${p.connection.replace(/ · .*/, "")} graduate. (Sample: a live run pulls this from their public profile.)`,
+      company_now: `${p.company} is expanding its Dallas-Fort Worth retail team this year. (Sample: a live run uses recent news.)`,
+      intro: `Hi ${first}, thanks for making time. I'm a junior at Texas A&M studying marketing. I've been working toward a sales or brand role in food and beverage, and I just applied to the summer internship here. I'd love to hear how you got started and what the team is like.`,
+      questions: [
+        `What does a typical week look like in your role?`,
+        `What surprised you most when you started at ${p.company}?`,
+        `What do strong interns do in their first month?`,
+        `Which skills should I build this year to be ready?`,
+        `Is there anyone else you'd suggest I talk to?`,
+      ],
+      thank_you: `Thanks again for the chat today, ${first}. Your advice about [something they said] was really helpful, and I'm going to act on it this week. I hope we can stay in touch.`,
+    };
+  }
+
+  function prepSheet(p, sheet) {
+    const box = el("article", "card prep-sheet");
+    const head = el("div", "res-top");
+    const t = el("div");
+    t.append(el("div", "pv-name", `Coffee chat prep: ${p.name}`), el("div", "pv-sub", `${p.title} · ${p.company}`));
+    head.append(t);
+    const close = el("button", "btn small", "Close");
+    close.type = "button";
+    close.addEventListener("click", () => box.remove());
+    head.append(close);
+    box.append(head);
+    const sec = (label, node) => { const d = el("div", "prep-sec"); d.append(el("span", "label", label), node); box.append(d); };
+    sec("Who they are", el("p", null, sheet.about));
+    sec("What's new at the company", el("p", null, sheet.company_now));
+    const intro = el("p", "say-it", sheet.intro);
+    sec("Your 20-second intro", intro);
+    const ol = el("ol");
+    (sheet.questions || []).forEach((q) => ol.append(el("li", null, q)));
+    sec("Questions to ask", ol);
+    sec("Thank-you note to send after", el("p", "say-it", sheet.thank_you));
+    const acts = el("div", "actions");
+    const cp = el("button", "btn small", "Copy thank-you note");
+    cp.type = "button";
+    cp.addEventListener("click", () => copyText(sheet.thank_you));
+    acts.append(cp);
+    box.append(acts);
+    return box;
+  }
+
+  async function openPrep(p, btn) {
+    const slot = $("t-prep");
+    slot.hidden = false;
+    if (result.sample) {
+      slot.replaceChildren(prepSheet(p, samplePrep(p)));
+      slot.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    const wait = el("div", "card progress");
+    const h = el("div", "pg-head");
+    const label = el("strong", null, `Preparing your chat with ${p.name}`);
+    h.append(el("span", "spinner"), label);
+    wait.append(h);
+    slot.replaceChildren(wait);
+    slot.scrollIntoView({ behavior: "smooth", block: "start" });
+    btn.disabled = true;
+    try {
+      const f = { ...(result.fields || currentFields()), code: $("t-code").value.trim(), mode: "prep",
+        p_name: p.name, p_title: p.title, p_company: p.company, p_connection: p.connection,
+        p_role: ((result.postings || []).find((x) => x.company === p.company) || {}).title || "" };
+      const sheet = await callApi(f, (t) => { label.textContent = t; });
+      slot.replaceChildren(prepSheet(p, sheet));
+    } catch (err) {
+      const e = el("div", "card t-error");
+      e.append(el("p", null, errText(err)));
+      slot.replaceChildren(e);
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  function trackStep() {
+    const c = counts();
+    $("t-track-line").textContent = c.people
+      ? `${c.people} ${c.people === 1 ? "person" : "people"} and ${c.apps} ${c.apps === 1 ? "application" : "applications"} in your tracker. Mark each one Sent once you send it, then Replied when they answer.`
+      : "Copy a note above and that person lands in your tracker. Mark them Sent once you send it, then Replied when they answer.";
+  }
+
   $("try-form").addEventListener("submit", (e) => {
     e.preventDefault();
-    const fields = {};
-    TRY_FIELDS.forEach((k) => { fields[k] = $(`t-${k}`).value.trim(); });
+    const fields = currentFields();
     store.set(KEYS.form, fields);
     fields.code = $("t-code").value.trim();
     if (fields.code) store.set(KEYS.code, fields.code);

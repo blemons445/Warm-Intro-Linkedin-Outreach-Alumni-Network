@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Work+Sans:wght@400;500;600&display=swap">
-  <link rel="stylesheet" href="assets/style.css?v=3.2">
+  <link rel="stylesheet" href="assets/style.css?v=3.3">
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
@@ -189,9 +189,12 @@
         <ol class="pg-log" id="t-log"></ol>
       </div>
 
-      <div class="card t-error" id="t-error" role="alert" hidden><p id="t-error-msg"></p><button class="btn small" type="button" data-demo>Watch a sample run instead</button></div>
+      <div class="card t-error" id="t-error" role="alert" hidden><p id="t-error-msg"></p><div class="actions"><button class="btn primary small" type="button" data-demo>Watch the sample run</button><a class="btn small" href="#run">Use it free in Claude</a></div></div>
 
       <div id="t-results" hidden>
+        <ol class="stepper" aria-label="Your plan">
+          <li><b>1</b>Apply</li><li><b>2</b>Message</li><li><b>3</b>Track</li><li><b>4</b>Prep the chat</li>
+        </ol>
         <p class="sample-note" id="t-sample" hidden>Sample run with fictional companies and people, so you can see what a real search returns.</p>
         <div class="res-head">
           <p class="summary" id="t-summary"></p>
@@ -206,6 +209,14 @@
         <h2>2. Then message these people <span class="count" id="t-c-ppl"></span></h2>
         <p class="src">Copy the note, open their profile, click Connect, then Add a note. Check each person's profile before you send.</p>
         <div class="res-list" id="t-people"></div>
+        <h2>3. Track every reply</h2>
+        <div class="track-step">
+          <p id="t-track-line"></p>
+          <a class="btn small" href="#tracker">Open your tracker</a>
+        </div>
+        <h2>4. When someone replies, prep for the chat</h2>
+        <p class="src">Press <strong>They replied: prep me</strong> on a person above. You get their background, your 20-second intro, questions to ask and a thank-you note.</p>
+        <div id="t-prep" hidden></div>
         <p class="src">Results come from public web search and can be wrong. Prefer to run it yourself in Claude? <a href="#run">Use the skill</a>.</p>
       </div>
     </section>
@@ -409,6 +420,6 @@
   </footer>
 
   <div class="toast" id="toast" role="status" hidden></div>
-  <script src="assets/app.js?v=3.2"></script>
+  <script src="assets/app.js?v=3.3"></script>
 </body>
 </html>
