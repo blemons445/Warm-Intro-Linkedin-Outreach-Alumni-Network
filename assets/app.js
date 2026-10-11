@@ -210,7 +210,7 @@
       const list = rows.filter((r) => r.kind === kind).sort(byDate);
       if (!list.length) {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="5" class="empty">No ${label} yet. Add one below, or try the sample data.</td>`;
+        tr.innerHTML = `<td colspan="5" class="empty">No ${label} yet. Copy a note on Try it, or add one below.</td>`;
         body.append(tr);
       } else list.forEach((r) => body.append(rowEl(r)));
     });
@@ -267,21 +267,6 @@
     } catch { toast("That file isn't a Past the Post backup."); }
   });
 
-  // Fictional sample data so visitors can see the tracker working.
-  $("sample").addEventListener("click", () => {
-    if (rows.length && !confirm("Replace your current entries with sample data?")) return;
-    const d = (n) => { const t = new Date(); t.setDate(t.getDate() - n); return t.toISOString().slice(0, 10); };
-    rows = [
-      { kind: "person", name: "Jordan Lee", company: "Acme Foods", detail: "Sales Coordinator · class of 2023", date: d(9), status: "chat" },
-      { kind: "person", name: "Priya Shah", company: "Acme Foods", detail: "Campus Recruiter", date: d(9), status: "replied" },
-      { kind: "person", name: "Marcus Hill", company: "Lone Star Beverage", detail: "Brand Manager · class of 2021", date: d(6), status: "sent" },
-      { kind: "person", name: "Ava Torres", company: "Lone Star Beverage", detail: "Former intern, now Analyst", date: d(6), status: "no_reply" },
-      { kind: "person", name: "Ben Carter", company: "Northfield Snacks", detail: "Field Sales Manager · class of 2022", date: d(2), status: "sent" },
-      { kind: "application", name: "Summer Sales Intern", company: "Acme Foods", detail: "Dallas, in person", date: d(10), status: "interview" },
-      { kind: "application", name: "Brand Marketing Intern", company: "Lone Star Beverage", detail: "Plano, hybrid", date: d(7), status: "applied" },
-    ].map((r) => ({ ...r, id: uid() }));
-    save(); renderTracker(); toast("Sample data loaded");
-  });
 
   $("clear").addEventListener("click", () => {
     if (!rows.length) return;
