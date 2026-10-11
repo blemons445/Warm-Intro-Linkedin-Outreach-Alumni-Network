@@ -734,7 +734,10 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
     copyText(prompt, AI[which].paste
       ? `Prompt copied. Paste it into ${AI[which].name} and press Send.`
       : `Opening ${AI[which].name}. The prompt is also copied, in case you need to paste it.`);
-    window.open(AI[which].url(prompt), "_blank", "noopener");
+    // A real link click, not window.open: iOS Safari keeps this tab alive when the link hands off to the Claude or ChatGPT app.
+    const a = document.createElement("a");
+    a.href = AI[which].url(prompt); a.target = "_blank"; a.rel = "noopener noreferrer";
+    document.body.append(a); a.click(); a.remove();
   }
 
   function startFree(which) {
@@ -742,14 +745,14 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
     store.set(KEYS.form, fields);
     $("t-error").hidden = true;
     if (!checkForm()) return;
+    // Save first: phones can drop this tab the moment the other app opens.
+    store.set(KEYS.pending, { fields, ai: which, at: Date.now() });
     openAssistant(which, searchPrompt(fields));
     document.querySelectorAll("[data-ai-name]").forEach((n) => { n.textContent = AI[which].name; });
     $("t-paste-step").innerHTML = AI[which].paste
       ? "paste your prompt (it is already copied) with Ctrl+V, or ⌘V on a Mac, and press <strong>Send</strong>."
       : "press <strong>Send</strong> if your message is waiting there.";
     showPaste(fields);
-    // Phones often reload the tab while you're in the other app, so remember that a run is waiting for its results.
-    store.set(KEYS.pending, { fields, ai: which, at: Date.now() });
   }
   function showPaste(fields, scroll = true) {
     $("t-paste").hidden = false;
