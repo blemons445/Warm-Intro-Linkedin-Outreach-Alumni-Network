@@ -573,7 +573,7 @@
     setBusy(true);
     try {
       result = await callApi({ ...fields, code: $("t-code").value.trim() }, logLine);
-      result.fields = fields;
+      result.fields = fields; result.at = Date.now();
       store.set(KEYS.last, result);
       renderResults();
       $("t-results").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -730,7 +730,9 @@ Then, as the very last line, write exactly: **Copy the block above, then [click 
 About me:
 ${aboutYou(f)}
 
-Give me a short prep sheet: who they are, one recent company fact, my 20-second intro, five questions to ask, a thank-you note to send after, and a short referral ask to send only if the chat goes well.`;
+Give me a short prep sheet: who they are, one recent company fact, my 20-second intro, five questions to ask, a thank-you note to send after, and a short referral ask to send only if the chat goes well.
+
+End with this last line: **[Back to Past the Post](${backUrl()})**`;
   }
 
   let lastAi = "claude";
@@ -809,14 +811,17 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
     result.via = lastAi;
     store.set(KEYS.pending, null);
     try { result.fields = JSON.parse($("t-paste").dataset.fields || "null") || currentFields(); } catch { result.fields = currentFields(); }
+    result.at = Date.now();
     store.set(KEYS.last, result);
     $("t-paste").hidden = true;
     renderResults();
     $("t-results").scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
-  // Each visit starts clean: past results aren't shown again (people you copied a note for are in the tracker).
-  result = null;
+  // Results from the last two hours come back, since tapping a LinkedIn or Claude link on a phone can close this tab.
+  // Older ones don't (people you copied a note for are in the tracker), and New search clears them.
+  const last = store.get(KEYS.last, null);
+  result = last && Array.isArray(last.applications) && Date.now() - (last.at || 0) < 2 * 3600e3 ? last : null;
   // ...unless a run is still waiting for its results (the tab reloaded while you were in Claude or ChatGPT).
   const pending = store.get(KEYS.pending, null);
   if (pending && pending.fields && Date.now() - (pending.at || 0) < 6 * 3600e3) {
