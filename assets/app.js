@@ -734,9 +734,12 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
     copyText(prompt, AI[which].paste
       ? `Prompt copied. Paste it into ${AI[which].name} and press Send.`
       : `Opening ${AI[which].name}. The prompt is also copied, in case you need to paste it.`);
-    // A real link click, not window.open: iOS Safari keeps this tab alive when the link hands off to the Claude or ChatGPT app.
+    // On phones, follow the link in this tab: iOS hands it to the Claude or ChatGPT app and leaves this page in place,
+    // where a new tab gets closed along with ours. If the app isn't installed, the saved search brings the paste box back.
+    const phone = window.matchMedia("(pointer: coarse)").matches;
     const a = document.createElement("a");
-    a.href = AI[which].url(prompt); a.target = "_blank"; a.rel = "noopener noreferrer";
+    a.href = AI[which].url(prompt); a.rel = "noopener noreferrer";
+    if (!phone) a.target = "_blank";
     document.body.append(a); a.click(); a.remove();
   }
 
