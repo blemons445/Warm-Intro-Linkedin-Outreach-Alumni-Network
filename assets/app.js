@@ -3,7 +3,7 @@
   "use strict";
 
   const $ = (id) => document.getElementById(id);
-  const KEYS = { theme: "wi-theme", checks: "wi-checks", rows: "wi-rows", form: "wi-form", last: "wi-last", code: "wi-code" };
+  const KEYS = { theme: "wi-theme", checks: "wi-checks", rows: "wi-rows", form: "wi-form", last: "wi-last", code: "wi-code", pending: "wi-pending" };
 
   // Storage can be blocked (private windows, strict settings); the app still works for the session.
   const store = {
@@ -620,7 +620,7 @@
   });
 
   $("t-again").addEventListener("click", () => {
-    result = null; store.set(KEYS.last, null); renderResults(); setApps([]);
+    result = null; store.set(KEYS.last, null); store.set(KEYS.pending, null); renderResults(); setApps([]);
     $("t-paste").hidden = true; $("t-paste-text").value = "";
     $("t-school").focus();
   });
@@ -762,9 +762,14 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
     $("t-paste-step").innerHTML = AI[which].paste
       ? "paste your prompt (it is already copied) with Ctrl+V, or ⌘V on a Mac, and press <strong>Send</strong>."
       : "press <strong>Send</strong> if your message is waiting there.";
+    showPaste(fields);
+    // Phones often reload the tab while you're in the other app, so remember that a run is waiting for its results.
+    store.set(KEYS.pending, { fields, ai: which, at: Date.now() });
+  }
+  function showPaste(fields, scroll = true) {
     $("t-paste").hidden = false;
     $("t-paste").dataset.fields = JSON.stringify(fields);
-    $("t-paste").scrollIntoView({ behavior: "smooth", block: "center" });
+    if (scroll) $("t-paste").scrollIntoView({ behavior: "smooth", block: "center" });
   }
   document.querySelectorAll("[data-run]").forEach((b) => b.addEventListener("click", () => startFree(b.dataset.run)));
   $("t-reopen").addEventListener("click", () => startFree(lastAi));
@@ -775,7 +780,12 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
     let raw = block ? block[1] : text;
     const a = raw.indexOf("{"), b = raw.lastIndexOf("}");
     if (a < 0 || b < a) throw new Error("no json");
-    const data = JSON.parse(raw.slice(a, b + 1));
+    const json = raw.slice(a, b + 1);
+    let data;
+    try { data = JSON.parse(json); } catch {
+      // Some copy paths turn quotes curly or leave trailing commas; fix those and try once more.
+      data = JSON.parse(json.replace(/[\u201C\u201D\u201E\u201F\u2033]/g, '"').replace(/[\u2018\u2019]/g, "'").replace(/,\s*([}\]])/g, "$1"));
+    }
     if (!Array.isArray(data.applications)) throw new Error("bad shape");
     const str = (v, max) => String(v ?? "").slice(0, max);
     return {
@@ -801,6 +811,7 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
       return;
     }
     result.via = lastAi;
+    store.set(KEYS.pending, null);
     try { result.fields = JSON.parse($("t-paste").dataset.fields || "null") || currentFields(); } catch { result.fields = currentFields(); }
     store.set(KEYS.last, result);
     $("t-paste").hidden = true;
@@ -810,6 +821,14 @@ Give me a short prep sheet: who they are, one recent company fact, my 20-second 
 
   // Each visit starts clean: past results aren't shown again (people you copied a note for are in the tracker).
   result = null;
+  // ...unless a run is still waiting for its results (the tab reloaded while you were in Claude or ChatGPT).
+  const pending = store.get(KEYS.pending, null);
+  if (pending && pending.fields && Date.now() - (pending.at || 0) < 6 * 3600e3) {
+    lastAi = AI[pending.ai] ? pending.ai : "claude";
+    setApps(pending.fields.apps || []);
+    document.querySelectorAll("[data-ai-name]").forEach((n) => { n.textContent = AI[lastAi].name; });
+    showPaste(pending.fields, false);
+  }
 
   // ---------- Start ----------
   renderRunSteps();
