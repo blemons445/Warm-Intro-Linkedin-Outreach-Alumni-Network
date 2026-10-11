@@ -700,6 +700,9 @@
     ].filter(Boolean).join("\n") || "(nothing else given)";
   }
 
+  // Phones can close this tab when the AI app opens, so every answer ends with a link back here.
+  const backUrl = () => `${location.origin}${location.pathname}#try`;
+
   function searchPrompt(f) {
     const apps = f.apps.map((a, i) => `${i + 1}. ${a.company}: ${a.role || "internship"}${a.url ? ` (${a.url})` : ""}`).join("\n");
     return `Use web search. I applied to these jobs and want to meet people at each company.
@@ -715,8 +718,10 @@ Also try hard to find the likely hiring manager, the person the role reports to:
 
 For each person, write a LinkedIn note under 200 characters in this order: who I am (school, year, major), the exact role I applied for, one specific detail from their profile (if they were promoted or had a clear win, congratulate them on it; otherwise a career move or the brand they work on), and a friendly ask for a quick 15-min chat about their role and how they got there. Example: "Hi Kinsey, A&M marketing junior here, just applied for KDP's Sales Analyst internship. Saw you moved from PepsiCo to KDP, congrats on the promotion! Open to a quick 15-min chat about that jump?"
 
-End with only this JSON in a code block:
-{"summary":"","applications":[{"company":"","role":"","posting_url":"","people":[{"name":"","title":"","profile_url":"","hiring_manager":false,"other_team":false,"connection":"","why":"","note":""}]}]}`;
+End with this JSON in a code block:
+{"summary":"","applications":[{"company":"","role":"","posting_url":"","people":[{"name":"","title":"","profile_url":"","hiring_manager":false,"other_team":false,"connection":"","why":"","note":""}]}]}
+
+Then, as the very last line, write exactly: **Copy the block above, then [click back to the website](${backUrl()}) and paste it.**`;
   }
 
   function prepPrompt(p, app, f) {
