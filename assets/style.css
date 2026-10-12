@@ -379,3 +379,5 @@ details.code-box[open] summary { margin-bottom: 10px; }
 .paste-box textarea { font: 0.88rem/1.5 var(--mono); color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; width: 100%; resize: vertical; }
 
 input[aria-invalid="true"] { border-color: var(--bad) !important; box-shadow: 0 0 0 2px color-mix(in srgb, var(--bad) 25%, transparent); }
+.btn.primary.linkedin { background: #0a66c2; border-color: #0a66c2; color: #fff; }
+.btn.primary.linkedin:hover { background: #004182; border-color: #004182; }
